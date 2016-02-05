@@ -1,0 +1,17 @@
+.todo {
+  background-color:$background-color-norm + 50;
+  .list-templates {
+    .existing-lists {
+      border: 1px solid black;
+      padding: 25px 15px;
+      .title-lists {
+        font-size: 18px;
+        color: $font-color-norm + 100;
+      }
+    }
+    .list-template-container {
+      width: 100%;
+      background-color: $background-color-norm + 25;
+    }
+  }
+}

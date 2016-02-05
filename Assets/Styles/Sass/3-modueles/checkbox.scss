@@ -1,0 +1,28 @@
+.remove-item {
+	color:$background-color-norm+25;
+	display: none;
+	padding: 0 10px;
+	cursor: default;
+}
+.custom-checkbox {
+	width: 25px;
+	height: 25px;
+	border: 1px solid black;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	-webkit-transition: 0.25s ease;
+	-moz-transition: 0.25s ease;
+	-ms-transition: 0.25s ease;
+	-o-transition: 0.25s ease;
+	transition: 0.25s ease;
+	cursor: pointer;
+	&:hover {
+		border-width: 0;
+		border-color:rgba(0,0,0,0.5);
+	}
+}

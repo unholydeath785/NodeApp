@@ -1,0 +1,14 @@
+//normalize html
+body,html {
+  margin: 0;
+  padding: 0;
+  font-family: 'custom',monospace,sans-serif;
+}
+//import tools
+@import "1-tools/variables.scss";
+//import sections
+@import "2-sections/todo.scss";
+//import modueles
+@import "3-modueles/navbar.scss";
+@import "3-modueles/lists.scss";
+@import "3-modueles/checkbox.scss";

@@ -7,5 +7,5 @@ app.on('ready',function () {
     width:1080
   })
   console.log("Loading");
-  mainWindow.loadUrl('file://' + __dirname + '/index.html')
+  mainWindow.loadURL ('file://' + __dirname + '/index.html')
 })
