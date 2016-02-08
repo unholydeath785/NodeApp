@@ -227,7 +227,7 @@ $('.add-btn-item').click(function () {
 
 //functions
 function getData(keyLength,itemLength) {
-  console.log("called");
+  $('.create-lists-wrapper').hide();
   var name = $('.create-list-input-1').val()
   var desc = $('.create-list-input-2').val();
   var newList = new List(name,desc);
@@ -239,35 +239,35 @@ function getData(keyLength,itemLength) {
     listKeys.push(value);
   }
 
-  // for (var i = 0; i < itemLength; i++) {
-  //   itemList = [];
-  //   var specialId = "#"+(i+1);
-  //   var valueObj = $('.add-item').find(specialId)
-  //   for (var j = 0; j < keyLength; j++) {
-  //     if (valueObj.next().val != "") {
-  //       value = valueObj.val();
-  //       valueObj = valueObj.next();
-  //       itemList.push(value);
-  //     }
-  //   }
-  // }
+  for (var i = 0; i < itemLength; i++) {
+    var foo = [];
+    var specialId = "#"+(i+1);
+    var valueObj = $('.add-item').find(specialId)
+    for (var j = 0; j < keyLength; j++) {
+      if (valueObj.next().val != "") {
+        value = valueObj.val();
+        valueObj = valueObj.next();
+        foo.push(value);
+      }
+    }
+    itemList.push(foo);
+  }
 
   for (var i = 0; i < listKeys.length; i++) {
     if (i == listKeys.length - 1) {
-      Key(listKeys[i],newList, true);
+      new Key(listKeys[i],newList, true);
     } else {
-      Key(listKeys[i],newList, false);
+      new Key(listKeys[i],newList, false);
     }
   }
 
-  // for (var i = 0; i < itemList.length; i++) {
-  //   if (i == itemList.length -1) {
-  //     Item(itemList[i],newList, true);
-  //   } else {
-  //     Item(itemList[i],newList, false);
-  //   }
-  // }
-  $('.create-lists-wrapper').hide();
+  for (var i = 0; i < itemList.length; i++) {
+     if (i == itemList.length -1) {
+       new Item(itemList[i],newList, true);
+     } else {
+       new Item(itemList[i],newList, false);
+     }
+  }
 }
 
 function nextCreatePannel(id) {
