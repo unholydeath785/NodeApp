@@ -40,7 +40,7 @@ body, html {
     border-radius: 2px; }
   .create-lists .create-lists-wrapper {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 0px;
     width: 100%;
     height: 100%;
@@ -66,6 +66,20 @@ body, html {
         display: block;
         text-align: center;
         margin: 10px auto; }
+      .create-lists .create-lists-wrapper .create-lists-overlay .key-placeholder {
+        margin-left: 50px; }
+        .create-lists .create-lists-wrapper .create-lists-overlay .key-placeholder .remove-key-input img {
+          height: 25px;
+          width: 25px; }
+        .create-lists .create-lists-wrapper .create-lists-overlay .key-placeholder:hover {
+          cursor: pointer; }
+      .create-lists .create-lists-wrapper .create-lists-overlay .item-placeholder {
+        margin-left: 50px; }
+        .create-lists .create-lists-wrapper .create-lists-overlay .item-placeholder .remove-item-input img {
+          height: 25px;
+          width: 25px; }
+        .create-lists .create-lists-wrapper .create-lists-overlay .item-placeholder:hover {
+          cursor: pointer; }
       .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input {
         display: inline-block;
         margin: 10px;
@@ -170,7 +184,8 @@ body, html {
 
 .list-template {
   display: none;
-  margin-top: 15px; }
+  margin-top: 15px;
+  padding-bottom: 25px; }
   .list-template .list {
     margin-left: 50px;
     width: 50%;
@@ -188,18 +203,68 @@ body, html {
     .list-template .list .item .completed {
       font-size: 16px;
       text-align: center; }
-    .list-template .list .item .name {
-      cursor: pointer;
-      font-size: 16px;
-      text-align: center; }
     .list-template .list .item td {
       font-size: 16px;
       color: white; }
+    .list-template .list .item .edit-item {
+      display: none; }
+      .list-template .list .item .edit-item .remove-list-item img {
+        width: 25px;
+        height: 25px;
+        margin-right: 25px; }
+        .list-template .list .item .edit-item .remove-list-item img:hover {
+          cursor: pointer; }
+      .list-template .list .item .edit-item .edit-item {
+        color: #747474; }
+        .list-template .list .item .edit-item .edit-item:hover {
+          cursor: pointer;
+          color: #04d765;
+          font-weight: 700;
+          text-decoration: underline; }
     .list-template .list .notes {
       font-style: italic;
       display: none;
       font-size: 12px;
       color: white; }
+  .list-template .set-all-checked {
+    margin-top: 15px;
+    text-transform: uppercase;
+    margin-left: 100px;
+    margin-right: 50px;
+    text-align: center;
+    color: #747474;
+    font-weight: 800; }
+    .list-template .set-all-checked:hover {
+      cursor: pointer;
+      color: #04d765;
+      text-decoration: underline; }
+  .list-template .set-all-unchecked {
+    margin-top: 15px;
+    text-transform: uppercase;
+    margin-left: 100px;
+    margin-right: 50px;
+    text-align: center;
+    color: #747474;
+    font-weight: 800; }
+    .list-template .set-all-unchecked:hover {
+      cursor: pointer;
+      color: #04d765;
+      text-decoration: underline; }
+  .list-template #add-item-to-list {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-left: 100px;
+    display: none; }
+  .list-template .btn-edit {
+    margin-top: 15px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    color: black;
+    border: 1px solid black;
+    background-color: #747474; }
+    .list-template .btn-edit:hover {
+      cursor: pointer;
+      background-color: #04d765; }
 
 .remove-item {
   color: #3f3e42;

@@ -1,7 +1,8 @@
 var listArray = [];
 //templates
 var insertListTemplate = function (list) {
-  var listTemplate = '<div class="list-template-container" data-showing="false" id="'+list.name+'">'+
+  var listTemplate = ''+
+  '<div class="list-template-container" data-showing="false" id="'+list.name+'">'+
     '<div class="template-info" onclick="toggleAddedList(this);">' +
       '<span class="template-name">'+list.name+' <span class="template-desc">'+list.desc+'</span><span class="show-template">></span></span><span class="complete-list" onclick="removeList(this);">Remove</span>' +
     '</div>'+
@@ -15,6 +16,9 @@ var insertListTemplate = function (list) {
         '<tr class="item">'+
         '</tr>'+
       '</table>' +
+      '<span onclick="addItem(this);" id="add-item-to-list" class="btn-edit">Add Item</span>'+
+      '<br><br>'+
+      '<span onclick="setAllChecked(this);" class="set-all-checked">Set All Checked</span><span onclick="setAllUnchecked(this);" class="set-all-unchecked">Set All Unchecked</span><span onclick="showEditMenu(this)" class="btn-edit">edit</span>'+
     '</div>' +
   '</div>';
   $('.list-templates').append(listTemplate);
@@ -30,6 +34,7 @@ var insertItemTemplate = function (list) {
     itemTemplate += '<tr class="item" id="'+tempId+'">'+
       '<td class="completed">'+
         '<span class="remove-item">Remove</span>'+
+        '<div class="edit-item"><span class="remove-list-item"><img onclick="removeListItem(this);" src="Assets/Images/Xmark.png"</span><span class="edit-item">Edit</span></div>'+
         '<img onclick="toggleCheckMark(this);" class="custom-checkbox" src="Assets/Images/Xmark.png" alt="Not Completed" />'+
       '</td>'
       for (var j = 0; j < list.keys.length; j++ ) {
@@ -115,7 +120,7 @@ groceries.items[0] = new Item(["Eggs","1$"],groceries,false);
 groceries.items[1] = new Item(["Milk","2$"],groceries,false);
 groceries.items[2] = new Item(["Meat (Sirlion Cut)","15$"],groceries,false);
 groceries.items[3] = new Item(["Apples","17$"],groceries,true);
-
+//hi
 //injections
 
 function injectNavBar() {
@@ -130,7 +135,6 @@ function injectNavBar() {
 // }
 
 //events
-
 
 function toggleAddedList(ele) {
   var id = "#" + $(ele).parent().prop("id");
@@ -209,23 +213,73 @@ $('.next-btn').click(function () {
 
 $('.add-btn-key').click(function () {
   id2++;
-  var keyTemplate = '<label class="input-label">Key Name: </label><input id="'+id2+'" class="create-list-input-1" name="name" type="text" placeholder="Key Name..."/><br>'
+  var keyTemplate = '<div class="key-placeholder"><label class="input-label">Key Name: </label><span class="remove-key-input" onclick="removeKey(this);"><img src="Assets/Images/Xmark.png"></span><input id="'+id2+'" class="create-list-input-1" name="name" type="text" placeholder="Key Name..."/><br></div>'
   $('.add-key').append(keyTemplate);
 })
 
 $('.add-btn-item').click(function () {
   id3++;
-  var itemTemplate = '<label class="input-label">Item Name: </label>'
+  var itemTemplate = '<div class="item-placeholder"><label class="input-label">Item Name: </label><span class="remove-item-input" onclick="removeKey(this);"><img src="Assets/Images/Xmark.png"></span>'
   for (var i = 0; i < id2; i++) {
     var specialId = "#"+(i+1);
     var value = $('.add-key').find(specialId).val();
     itemTemplate += '<input id="'+id3+'" class="create-list-input '+(i+1)+'" name="name" type="text" placeholder="Insert '+value+'..."/>'
   }
-  itemTemplate += '<br>'
+  itemTemplate += '</div><br class="break">'
   $('.add-item').append(itemTemplate);
 })
 
+function removeItem(ele) {
+  id3 -= 1;
+  $(ele).parent().parent().find(".break").remove()
+  $(ele).parent().slideUp(200,function () {
+    $(ele).parent().remove()
+  })
+}
+
+function removeKey(ele) {
+  id2 -= 1;
+  $(ele).parent().slideUp(200,function () {
+    $(ele).parent().remove()
+  })
+}
+
+function showEditMenu(ele) {
+  $(ele).parent().find(".list").find(".custom-checkbox").toggle();
+  $(ele).parent().find(".list").find(".edit-item").toggle();
+  $("#add-item-to-list").slideToggle(100);
+}
+
+function removeListItem(ele) {
+  $(ele).parent().parent().parent().parent().fadeOut(200,function () {
+    $(ele).parent().parent().parent().parent().remove()
+  })
+}
+
+function setAllChecked(ele) {
+  var thisListName = $(ele).parent().parent().prop("id");
+  var list = getList(thisListName);
+  for (var i = 0; i < list.items.length; i++) {
+    var uniqueID = "#" +(i+1)
+    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/Xmark.png")
+    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox")
+    toggleCheckMark(checkMarkEle)
+  }
+}
+
+function setAllUnchecked(ele) {
+  var thisListName = $(ele).parent().parent().prop("id");
+  var list = getList(thisListName);
+  for (var i = 0; i < list.items.length; i++) {
+    var uniqueID = "#" +(i+1)
+    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/CheckMark.png")
+    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox")
+    toggleCheckMark(checkMarkEle)
+  }
+}
+
 //functions
+
 function getData(keyLength,itemLength) {
   $('.create-lists-wrapper').hide();
   var name = $('.create-list-input-1').val()
@@ -268,6 +322,33 @@ function getData(keyLength,itemLength) {
        new Item(itemList[i],newList, false);
      }
   }
+  clearDataInput(itemLength,keyLength)
+}
+
+function clearDataInput(itemLength,keyLength) {
+  $('.create-list-input-1').val("")
+  $('.create-list-input-2').val("")
+  for (var i = 0; i < itemLength; i++) {
+    var specialId = "#"+(i+1);
+    var valueObj = $('.add-item').find(specialId);
+    var valueLabel = $('.add-item').find('.input-label')
+    for (var j = 0; j < keyLength; j++) {
+      if (valueObj.next().val != "") {
+        valueObj.remove();
+        valueLabel.remove();
+        valueObj = valueObj.next();
+      }
+    }
+  }
+
+  for (var i = 0; i < keyLength; i++) {
+    var specialId = "#"+(i+1);
+    $('.add-key').find(specialId).remove()
+    $('.add-key').find('.input-label').remove()
+  }
+
+  id2 = 0;
+  id3 = 0;
 }
 
 function nextCreatePannel(id) {
