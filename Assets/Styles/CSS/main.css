@@ -15,6 +15,116 @@ body, html {
     width: 100%;
     background-color: #3f3e42; }
 
+.edit-item-menu-section .edit-item-wrapper {
+  display: none;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.7); }
+  .edit-item-menu-section .edit-item-wrapper .edit-item-overlay {
+    width: 600px;
+    height: 600px;
+    background-color: #cbcbcb;
+    border: 1px solid black;
+    margin: 10% auto 0; }
+    .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-key {
+      padding-left: 25px;
+      margin-right: 125px; }
+    .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-list-input {
+      width: 125px;
+      display: inline-block;
+      margin: 15px;
+      padding: 5px 10px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid #04d765;
+      transition: border 1s;
+      outline: none; }
+      .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-list-input:focus {
+        border: 3px solid #04d765; }
+    .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .btn-save {
+      margin-left: 15px;
+      margin-top: 15px;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      color: black;
+      border: 1px solid black;
+      background-color: #747474; }
+      .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .btn-save:hover {
+        cursor: pointer;
+        background-color: #04d765; }
+    .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-lists-close {
+      float: right;
+      margin-right: 25px;
+      padding: 5px;
+      font-weight: 700;
+      font-size: 18px; }
+      .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-lists-close:hover {
+        color: red;
+        cursor: pointer; }
+    .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-menu-head {
+      text-align: center; }
+
+.add-item-section .add-item-wrapper {
+  display: none;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.7); }
+  .add-item-section .add-item-wrapper .add-item-overlay {
+    width: 600px;
+    height: 600px;
+    background-color: #cbcbcb;
+    border: 1px solid black;
+    margin: 10% auto 0; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-btn-item-edit {
+      text-align: center;
+      cursor: pointer; }
+      .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-btn-item-edit .add-btn-img {
+        width: 25px;
+        height: 25px; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-remove-item {
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      margin-left: 25px; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-list-input {
+      width: 125px;
+      display: inline-block;
+      margin: 15px;
+      padding: 5px 10px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid #04d765;
+      transition: border 1s;
+      outline: none; }
+      .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-list-input:focus {
+        border: 3px solid #04d765; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .btn-save {
+      margin-left: 15px;
+      margin-top: 15px;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      color: black;
+      border: 1px solid black;
+      background-color: #747474; }
+      .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .btn-save:hover {
+        cursor: pointer;
+        background-color: #04d765; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-lists-close {
+      float: right;
+      margin-right: 25px;
+      padding: 5px;
+      font-weight: 700;
+      font-size: 18px; }
+      .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-lists-close:hover {
+        color: red;
+        cursor: pointer; }
+    .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-menu-head {
+      text-align: center; }
+
 .header .navbar {
   width: 100%;
   list-style: none;

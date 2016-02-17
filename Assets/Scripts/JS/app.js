@@ -1,4 +1,9 @@
+var jsonfile = require('jsonfile')
+var request = require('request')
+
 var listArray = [];
+var file = '/Users/EvanCoulson/data.json'
+
 //templates
 var insertListTemplate = function (list) {
   var listTemplate = ''+
@@ -16,7 +21,7 @@ var insertListTemplate = function (list) {
         '<tr class="item">'+
         '</tr>'+
       '</table>' +
-      '<span onclick="addItem(this);" id="add-item-to-list" class="btn-edit">Add Item</span>'+
+      '<span onclick="addItem(this)" id="add-item-to-list" class="btn-edit">Add Item</span>'+
       '<br><br>'+
       '<span onclick="setAllChecked(this);" class="set-all-checked">Set All Checked</span><span onclick="setAllUnchecked(this);" class="set-all-unchecked">Set All Unchecked</span><span onclick="showEditMenu(this)" class="btn-edit">edit</span>'+
     '</div>' +
@@ -34,7 +39,7 @@ var insertItemTemplate = function (list) {
     itemTemplate += '<tr class="item" id="'+tempId+'">'+
       '<td class="completed">'+
         '<span class="remove-item">Remove</span>'+
-        '<div class="edit-item"><span class="remove-list-item"><img onclick="removeListItem(this);" src="Assets/Images/Xmark.png"</span><span class="edit-item">Edit</span></div>'+
+        '<div class="edit-item"><span class="remove-list-item"><img onclick="removeListItem(this);" src="Assets/Images/Xmark.png"</span><span class="edit-item" onclick="editItemMenu(this);">Edit</span></div>'+
         '<img onclick="toggleCheckMark(this);" class="custom-checkbox" src="Assets/Images/Xmark.png" alt="Not Completed" />'+
       '</td>'
       for (var j = 0; j < list.keys.length; j++ ) {
@@ -48,6 +53,31 @@ var insertItemTemplate = function (list) {
 
   return itemTemplate;
 }
+
+var insertItemTemplateSingle = function (list) {
+  var itemTemplate = '';
+  var id = "#"+list.name;
+  var listObj = $(id).parent().find('.btn-edit')
+  showEditMenu(listObj)
+  var tempItemList = [];
+  var i = list.items.length - 1;
+  var tempId = i+1;
+  itemTemplate += '<tr class="item" id="'+tempId+'">'+
+    '<td class="completed">'+
+      '<span class="remove-item">Remove</span>'+
+      '<div class="edit-item"><span class="remove-list-item"><img onclick="removeListItem(this);" src="Assets/Images/Xmark.png"</span><span class="edit-item" onclick="editItemMenu(this);">Edit</span></div>'+
+      '<img onclick="toggleCheckMark(this);" class="custom-checkbox" src="Assets/Images/Xmark.png" alt="Not Completed" />'+
+    '</td>'
+    for (var j = 0; j < list.keys.length; j++ ) {
+      itemTemplate += '<td class="'+list.items[i].names[j]+'">'+
+        list.items[i].names[j]+
+      '</td>'
+    }
+  itemTemplate += '</tr>'
+  console.log(itemTemplate)
+  $(id + ' tbody').append(itemTemplate);
+}
+
 
 var insertKeyTemplate = function (list) {
   var keyTemplate = '';
@@ -65,7 +95,7 @@ var insertKeyTemplate = function (list) {
 //objects
 var List = function(name,desc) {
   this.name = name;
-  this.id = listArray.length + 1;
+  this.id = listArray.length;
   this.desc = desc;
   this.items = [];
   this.keys = [];
@@ -74,21 +104,18 @@ var List = function(name,desc) {
 }
 
 var Item = function (name,list,final) {
-  this.list = list;
   this.isChecked = false;
   if (Array.isArray(name)) {
     this.names = name;
   }
-  this.id = list.items.length + 1;
+  this.id = list.items.length - 1;
   list.items.push(this);
   if (final) {
     this.itemTemplate = insertItemTemplate(list);
   }
-
 }
 
 var Key = function (name,list,final) {
-  this.list = list;
   this.name = name;
   list.keys.push(this);
   if (final) {
@@ -111,23 +138,6 @@ var getList = function (name) {
       return listArray[i];
     }
   }
-}
-
-var groceries = new List("Chores","A simple example list ");
-groceries.keys[0] = new Key(["Name"],groceries,false);
-groceries.keys[1] = new Key(["Price"],groceries,true);
-groceries.items[0] = new Item(["Eggs","1$"],groceries,false);
-groceries.items[1] = new Item(["Milk","2$"],groceries,false);
-groceries.items[2] = new Item(["Meat (Sirlion Cut)","15$"],groceries,false);
-groceries.items[3] = new Item(["Apples","17$"],groceries,true);
-//hi
-//injections
-
-function injectNavBar() {
-  $("header").append('<nav class="navbar">' +
-  '<a class="navbar-link active" href="index.html"><h1>MyHub</h1></a>' +
-  '<a class="navbar-link" href="calander.html"><li class="navbar-item">Calander</li></a>'+
-  '<a class="navbar-link" href="todo.html"><li class="navbar-item">To-Do</li></a></nav>');
 }
 
 // function injectLists() {
@@ -187,6 +197,10 @@ function toggleCheckMark(ele) {
 
 function removeList(ele) {
   $(ele).parent().parent().slideToggle(100);
+  var removeListName = $(ele).parent().parent().prop("id");
+  var removeList = getList(removeListName);
+  listArray.splice(removeList.id,1)
+  writeJSONData()
   $(ele).remove();
 }
 
@@ -219,7 +233,7 @@ $('.add-btn-key').click(function () {
 
 $('.add-btn-item').click(function () {
   id3++;
-  var itemTemplate = '<div class="item-placeholder"><label class="input-label">Item Name: </label><span class="remove-item-input" onclick="removeKey(this);"><img src="Assets/Images/Xmark.png"></span>'
+  var itemTemplate = '<div class="item-placeholder"><label class="input-label">Item Name: </label><span class="remove-item-input" onclick="removeItem(this);"><img src="Assets/Images/Xmark.png"></span>'
   for (var i = 0; i < id2; i++) {
     var specialId = "#"+(i+1);
     var value = $('.add-key').find(specialId).val();
@@ -229,12 +243,23 @@ $('.add-btn-item').click(function () {
   $('.add-item').append(itemTemplate);
 })
 
+$('.edit-lists-close').click(function () {
+  $('.edit-item-wrapper').slideUp(500);
+  clearEditMenu()
+})
+
+$('.add-lists-close').click(function () {
+  $('.add-item-wrapper').slideUp(500);
+  clearAddMenu()
+})
+
 function removeItem(ele) {
   id3 -= 1;
   $(ele).parent().parent().find(".break").remove()
   $(ele).parent().slideUp(200,function () {
     $(ele).parent().remove()
   })
+
 }
 
 function removeKey(ele) {
@@ -244,9 +269,12 @@ function removeKey(ele) {
   })
 }
 
+var editList;
 function showEditMenu(ele) {
   $(ele).parent().find(".list").find(".custom-checkbox").toggle();
   $(ele).parent().find(".list").find(".edit-item").toggle();
+  var listName =  $(ele).parent().parent().prop("id");
+  editList = getList(listName);
   $("#add-item-to-list").slideToggle(100);
 }
 
@@ -254,6 +282,13 @@ function removeListItem(ele) {
   $(ele).parent().parent().parent().parent().fadeOut(200,function () {
     $(ele).parent().parent().parent().parent().remove()
   })
+  var indexString = $(ele).parent().parent().parent().parent().prop("id");
+  var index = parseInt(indexString)
+  index -= 1;
+  var listName = $(ele).parent().parent().parent().parent().parent().parent().parent().parent().prop("id")
+  var list = getList(listName)
+  list.items.splice(index,1)
+  writeJSONData()
 }
 
 function setAllChecked(ele) {
@@ -322,6 +357,7 @@ function getData(keyLength,itemLength) {
        new Item(itemList[i],newList, false);
      }
   }
+  writeJSONData()
   clearDataInput(itemLength,keyLength)
 }
 
@@ -331,7 +367,7 @@ function clearDataInput(itemLength,keyLength) {
   for (var i = 0; i < itemLength; i++) {
     var specialId = "#"+(i+1);
     var valueObj = $('.add-item').find(specialId);
-    var valueLabel = $('.add-item').find('.input-label')
+    var valueLabel = $('.add-item').find('.input-label').parent()
     for (var j = 0; j < keyLength; j++) {
       if (valueObj.next().val != "") {
         valueObj.remove();
@@ -344,11 +380,28 @@ function clearDataInput(itemLength,keyLength) {
   for (var i = 0; i < keyLength; i++) {
     var specialId = "#"+(i+1);
     $('.add-key').find(specialId).remove()
-    $('.add-key').find('.input-label').remove()
+    $('.add-key').find('.input-label').parent().remove()
   }
 
   id2 = 0;
   id3 = 0;
+}
+
+function addItem(ele) {
+  $('.add-item-wrapper').slideDown();
+  var listName = $(ele).parent().parent().prop("id")
+  var list = getList(listName);
+  addInputs(list,ele);
+}
+
+function addInputs(list) {
+  var itemTemplate = '<div class="add-placeholder"><span class="remove-item-input" onclick="removeItem(this);"><img class="add-remove-item" src="Assets/Images/Xmark.png"></span>'
+  for (var i = 0; i < list.keys.length; i++) {
+    var value = list.keys[i].name;
+    itemTemplate += '<input id="'+(i+1)+'" class="add-list-input '+(i+1)+'" name="name" type="text" placeholder="Insert '+value+'..."/>'
+  }
+  itemTemplate += '</div><br class="break"><span onclick="addItemSave(this)" class="btn-save">Save</span>'
+  $('.add-item-menu').append(itemTemplate);
 }
 
 function nextCreatePannel(id) {
@@ -359,8 +412,120 @@ function nextCreatePannel(id) {
   $('.create-lists-wrapper, ' +id).show();
 }
 
+var item
+function editItemMenu(ele) {
+  $(".edit-item-wrapper").slideDown(500);
+
+  item = $(ele).parent().parent().parent().parent();
+  var itemID = $(item).prop("id")
+  var id = parseInt(itemID);
+  id -= 1;
+  listName = $(ele).parent().parent().parent().parent().parent().parent().parent().parent().prop("id")
+  var inputHTML = '<br>'
+  for (var i = 0; i < editList.keys.length; i++) {
+    inputHTML += '<span class="edit-key">'+editList.keys[i].name+'</span>'
+  }
+  inputHTML += '<br>'
+  for (var i = 0; i < editList.keys.length; i++) {
+    inputHTML += '<input id="'+(i+1)+'" class="edit-list-input '+(i+1)+'" value="'+editList.items[id].names[i]+'" name="name" type="text" placeholder="Edit Item"/>'
+  }
+  inputHTML += '<br><br><span onclick="editItemSave(this)" class="btn-save">Save</span>'
+  $('.edit-item-menu').append(inputHTML)
+}
+
+function editItemSave(ele) {
+  $(".edit-item-wrapper").slideUp(500);
+  var itemID = $(item).prop("id")
+  var id = parseInt(itemID);
+  id -= 1
+  var newValues = [];
+  for (var i = 0; i < editList.keys.length; i++) {
+    newValues.push($('.edit-item-menu').find("#"+(i+1)).val());
+  }
+  for (var i = 0; i < editList.keys.length; i++) {
+    $(item).find("."+editList.items[id].names[i]).text(newValues[i])
+  }
+  editList.items[id].names = newValues
+  writeJSONData()
+  clearEditMenu()
+}
+
+function addItemSave(ele) {
+  $(".add-item-wrapper").slideUp(500);
+  var newValues = []
+  for (var i = 0; i < editList.keys.length; i++) {
+    var inputClass = "#"+(i+1)
+    var val = $('.add-list-input').parent().find(inputClass).val();
+    newValues.push(val)
+  }
+  new Item(newValues,editList, false);
+  insertItemTemplateSingle(editList)
+  writeJSONData()
+  clearEditMenu()
+}
+
+function clearEditMenu() {
+  for (var i = 0; i < editList.keys.length; i++) {
+    $('.edit-item-menu').find(".edit-key").remove();
+    $('.edit-item-menu').find(".btn-save").remove();
+    $('.edit-item-menu').find("input").remove();
+    $('.edit-item-menu').find("br").remove();
+  }
+}
+
+function clearAddMenu() {
+  $('.add-item-menu').find('.add-placeholder').remove();
+  $('.add-item-menu').find('br').remove();
+}
+
+function writeJSONData() {
+  jsonfile.writeFile(file, listArray, function (err) {
+    alert("save:" + err)
+    uploadFileToServer()
+  })
+}
+
+function uploadFileToServer() {
+
+}
+
+function loadJSONData() {
+  var object;
+  jsonfile.readFile(file, function(err, obj) {
+    object = obj;
+    for (var i = 0; i < object.length; i++) {
+      var list = new List(object[i].name, object[i].desc);
+      for (var j = 0; j < object[i].keys.length; j++) {
+        var keyName = object[i].keys[j].name
+        if (j == object[i].keys.length - 1) {
+          new Key(keyName,list, true);
+        } else {
+          new Key(keyName,list, false);
+        }
+      }
+      for (var j = 0; j < object[i].items.length; j++) {
+        var itemNames = []
+        for (var k = 0; k < object[i].items.length; k++) {
+          var itemName = object[i].items[j].names[k];
+          itemNames.push(itemName)
+        }
+        if (j == object[i].items.length - 1) {
+          new Item(itemNames,list, true);
+        } else {
+          new Item(itemNames,list, false);
+        }
+      }
+    }
+  })
+}
+
 //onready
 $(document).ready(function () {
-  injectNavBar();
-  // injectLists();
+  loadJSONData();
+  function injectNavBar() {
+    $("header").append('<nav class="navbar">' +
+    '<a class="navbar-link active" href="index.html"><h1>MyHub</h1></a>' +
+    '<a class="navbar-link" href="calander.html"><li class="navbar-item">Calander</li></a>'+
+    '<a class="navbar-link" href="todo.html"><li class="navbar-item">To-Do</li></a></nav>');
+  }
 });

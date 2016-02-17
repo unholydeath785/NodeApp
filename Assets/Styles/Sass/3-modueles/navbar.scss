@@ -1,15 +1,15 @@
 .header {
-    .navbar {
-      width: 100%;
-      list-style: none;
+  .navbar {
+    width: 100%;
+    list-style: none;
+    background-color: $background-color-norm;
+    .navbar-link {
       background-color: $background-color-norm;
-      .navbar-link {
-        background-color: $background-color-norm;
-        text-decoration: none;
-        color:$font-color-norm;
-      }
-      .active {
-        color:$font-color-active;
-      }
+      text-decoration: none;
+      color:$font-color-norm;
     }
+    .active {
+      color:$font-color-active;
+    }
+  }
 }
