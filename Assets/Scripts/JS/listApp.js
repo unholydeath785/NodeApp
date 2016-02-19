@@ -181,6 +181,8 @@ function toggleCheckMark(ele) {
     $(parentTemplate + ' ' + id + ' .completed .remove-item').show(100);
   }
   if (list.allChecked() == true) {
+    var notificationText = list.name + " has been completed"
+    notification(notificationText, "List Complete");
     $(ele).parent().parent().parent().parent().parent().slideToggle(500,function() {
       var parentId = "#"+$(this).parent().prop("id");
       $(this).parent().prop("data-showing","false");
@@ -214,25 +216,30 @@ $('.create-lists-close').click(function () {
   $('.create-lists-wrapper').slideUp(200);
 })
 
+
+
 var id2 = 0;
 var id3 = 0;
-$('.next-btn').click(function () {
-  $(this).parent().hide();
-  var id = $(this).parent().prop("id");
+function nextSlide (ele) {
+  $(ele).parent().hide();
+  var id = $(ele).parent().prop("id");
   nextCreatePannel(id)
+  disableNextSlideButton(''+idInt+'')
   if (id == "3") {
     getData(id2,id3);
   }
-})
+}
 
 $('.add-btn-key').click(function () {
   id2++;
+  disableNextSlideButton('2')
   var keyTemplate = '<div class="key-placeholder"><label class="input-label">Key Name: </label><span class="remove-key-input" onclick="removeKey(this);"><img src="Assets/Images/Xmark.png"></span><input id="'+id2+'" class="create-list-input-1" name="name" type="text" placeholder="Key Name..."/><br></div>'
   $('.add-key').append(keyTemplate);
 })
 
 $('.add-btn-item').click(function () {
   id3++;
+  disableNextSlideButton('3')
   var itemTemplate = '<div class="item-placeholder"><label class="input-label">Item Name: </label><span class="remove-item-input" onclick="removeItem(this);"><img src="Assets/Images/Xmark.png"></span>'
   for (var i = 0; i < id2; i++) {
     var specialId = "#"+(i+1);
@@ -255,6 +262,7 @@ $('.add-lists-close').click(function () {
 
 function removeItem(ele) {
   id3 -= 1;
+  disableNextSlideButton('3')
   $(ele).parent().parent().find(".break").remove()
   $(ele).parent().slideUp(200,function () {
     $(ele).parent().remove()
@@ -264,6 +272,7 @@ function removeItem(ele) {
 
 function removeKey(ele) {
   id2 -= 1;
+  disableNextSlideButton('2')
   $(ele).parent().slideUp(200,function () {
     $(ele).parent().remove()
   })
@@ -325,6 +334,9 @@ function getData(keyLength,itemLength) {
   for (var i = 0; i < keyLength; i++) {
     var specialId = "#"+(i+1);
     var value = $('.add-key').find(specialId).val()
+    if (value == "undefined") {
+      value = "";
+    }
     listKeys.push(value);
   }
 
@@ -336,6 +348,9 @@ function getData(keyLength,itemLength) {
       if (valueObj.next().val != "") {
         value = valueObj.val();
         valueObj = valueObj.next();
+        if (value == "undefined") {
+          value = "";
+        }
         foo.push(value);
       }
     }
@@ -358,6 +373,8 @@ function getData(keyLength,itemLength) {
      }
   }
   writeJSONData()
+  var notificationText = "List " + newList.name + " has been created"
+  notification(notificationText,"List Created")
   clearDataInput(itemLength,keyLength)
 }
 
@@ -480,7 +497,6 @@ function clearAddMenu() {
 
 function writeJSONData() {
   jsonfile.writeFile(file, listArray, function (err) {
-    alert("save:" + err)
     uploadFileToServer()
   })
 }
@@ -519,13 +535,89 @@ function loadJSONData() {
   })
 }
 
+function notification(text,title) {
+  var options = {
+    body: text,
+    icon: './Assets/Images/app.icns'
+  }
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  } else if (Notification.permission == "granted") {
+    var audio = new Audio('./Assets/Sounds/notificationShow.mp3');
+    audio.play();
+    var notification = new Notification(title,options);
+  } else if (Notification.permission == "denied") {
+    Notification.requestPermission(function (permission) {
+      if (permission == "granted") {
+        var audio = new Audio('./Assets/Sounds/notificationShow.mp3');
+        audio.play();
+        var notification = new Notification(title,options);
+      }
+    })
+  }
+}
+
+
+function disableNextSlideButton(id) {
+  if (id == '1') {
+    var name = $('.create-list-input-1').val()
+    for (var i = 0; i < listArray.length; i++) {
+      var list = listArray[i];
+      if (list.name == name) {
+        $('.next-btn').css("background-color","rgb(219, 33, 33)")
+        return true
+      }
+    }
+    if (name.length == 0) {
+      $('.next-btn').css("background-color","rgb(219, 33, 33)")
+      return true
+    }
+    $('.next-btn').css("background-color","#04d765")
+    return false
+  }
+  if (id == '2') {
+    if (id2 == 0) {
+      $('.next-btn').css("background-color","rgb(219, 33, 33)")
+      return true
+    }
+    $('.next-btn').css("background-color","#04d765")
+    return false
+  }
+  if (id == '3') {
+    if (id3 == 0) {
+      $('.next-btn').css("background-color","rgb(219, 33, 33)")
+      return true
+    }
+    $('.next-btn').css("background-color","#04d765")
+    return false
+  }
+}
+
+function validateName(ele) {
+  var name = $('.create-list-input-1').val()
+  if (name.length > 0) {
+    for (var i = 0; i < listArray.length; i++) {
+      var list = listArray[i];
+      if (list.name != name) {
+        nextSlide(ele)
+      }
+    }
+  }
+}
+
+function validateKeys(ele) {
+  if (id2 > 0) {
+    nextSlide(ele)
+  }
+}
+
+function validateItems(ele) {
+  if (id3 > 0) {
+    nextSlide(ele)
+  }
+}
+
 //onready
 $(document).ready(function () {
   loadJSONData();
-  function injectNavBar() {
-    $("header").append('<nav class="navbar">' +
-    '<a class="navbar-link active" href="index.html"><h1>MyHub</h1></a>' +
-    '<a class="navbar-link" href="calander.html"><li class="navbar-item">Calander</li></a>'+
-    '<a class="navbar-link" href="todo.html"><li class="navbar-item">To-Do</li></a></nav>');
-  }
 });
