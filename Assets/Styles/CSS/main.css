@@ -1,19 +1,28 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300);
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'custom',monospace,sans-serif; }
+  font-family: 'Roboto Condensed', sans-serif; }
 
 .todo {
-  background-color: #58575b; }
-  .todo .list-templates .existing-lists {
-    border: 1px solid black;
-    padding: 25px 15px; }
-    .todo .list-templates .existing-lists .title-lists {
-      font-size: 18px;
-      color: #d8d8d8; }
-  .todo .list-templates .list-template-container {
-    width: 100%;
-    background-color: #3f3e42; }
+  background-color: #f0f0f0;
+  width: 100%;
+  height: 100%; }
+  .todo .list-templates {
+    min-height: 100%;
+    height: 100%;
+    width: 100%; }
+    .todo .list-templates .existing-lists {
+      background-color: #ccaf1a;
+      border: 1px solid black;
+      padding: 25px 15px; }
+      .todo .list-templates .existing-lists .title-lists {
+        font-size: 20px;
+        font-weight: 700;
+        color: black; }
+    .todo .list-templates .list-template-container {
+      width: 100%;
+      background-color: #bbe8bf; }
 
 .edit-item-menu-section .edit-item-wrapper {
   display: none;
@@ -38,22 +47,21 @@ body, html {
       padding: 5px 10px;
       background: none;
       border: none;
-      border-bottom: 3px solid #04d765;
+      border-bottom: 3px solid #007375;
       transition: border 1s;
       outline: none; }
       .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-list-input:focus {
-        border: 3px solid #04d765; }
+        border: 3px solid #007375; }
     .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .btn-save {
-      margin-left: 15px;
       margin-top: 15px;
       text-transform: uppercase;
       padding: 5px 10px;
       color: black;
-      border: 1px solid black;
-      background-color: #747474; }
+      border: 2px solid black;
+      background-color: #2CCCC5; }
       .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .btn-save:hover {
         cursor: pointer;
-        background-color: #04d765; }
+        border-color: #f5c945; }
     .edit-item-menu-section .edit-item-wrapper .edit-item-overlay .edit-item-menu .edit-lists-close {
       float: right;
       margin-right: 25px;
@@ -97,11 +105,11 @@ body, html {
       padding: 5px 10px;
       background: none;
       border: none;
-      border-bottom: 3px solid #04d765;
+      border-bottom: 3px solid #007375;
       transition: border 1s;
       outline: none; }
       .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-list-input:focus {
-        border: 3px solid #04d765; }
+        border: 3px solid #007375; }
     .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .btn-save {
       margin-left: 15px;
       margin-top: 15px;
@@ -109,10 +117,10 @@ body, html {
       padding: 5px 10px;
       color: black;
       border: 1px solid black;
-      background-color: #747474; }
+      background-color: black; }
       .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .btn-save:hover {
         cursor: pointer;
-        background-color: #04d765; }
+        background-color: #007375; }
     .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-lists-close {
       float: right;
       margin-right: 25px;
@@ -125,29 +133,41 @@ body, html {
     .add-item-section .add-item-wrapper .add-item-overlay .add-item-menu .add-menu-head {
       text-align: center; }
 
+.eye-candy {
+  width: 100%;
+  z-index: -100;
+  position: absolute; }
+  .eye-candy .eye-candy-image {
+    background-image: url("../../../Assets/Images/eye-candy.png");
+    background-position: bottom left;
+    background-repeat: repeat-x;
+    height: 724px; }
+
 .header .navbar {
   width: 100%;
   list-style: none;
-  background-color: #262529; }
+  background-color: #A2CFA6; }
   .header .navbar .navbar-link {
-    background-color: #262529;
+    background-color: #A2CFA6;
     text-decoration: none;
-    color: #747474; }
+    color: black; }
   .header .navbar .active {
-    color: #04d765; }
+    color: #007375; }
 
 .create-lists {
   margin-top: 25px; }
   .create-lists .create-list-btn {
-    width: 50px;
-    height: 20px;
-    font-size: 18px;
-    padding: 5px 10px;
-    background-color: #00a533;
+    position: absolute;
     margin-left: 25px;
-    border: 1px solid #535353;
-    cursor: pointer;
-    border-radius: 2px; }
+    margin-top: 15px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    color: black;
+    border: 2px solid black;
+    background-color: #2CCCC5; }
+    .create-lists .create-list-btn:hover {
+      cursor: pointer;
+      border-color: #f5c945; }
   .create-lists .create-lists-wrapper {
     display: none;
     position: fixed;
@@ -196,22 +216,22 @@ body, html {
         padding: 5px 10px;
         background: none;
         border: none;
-        border-bottom: 3px solid #04d765;
+        border-bottom: 3px solid #007375;
         transition: border 1s;
         outline: none; }
         .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input:focus {
-          border: 3px solid #04d765; }
+          border: 3px solid #007375; }
       .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input-1, .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input-2 {
         display: block;
         margin: 10px auto;
         padding: 5px 10px;
         background: none;
         border: none;
-        border-bottom: 3px solid #04d765;
+        border-bottom: 3px solid #007375;
         transition: border 1s;
         outline: none; }
         .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input-1:focus, .create-lists .create-lists-wrapper .create-lists-overlay .create-list-input-2:focus {
-          border: 3px solid #04d765; }
+          border: 3px solid #007375; }
       .create-lists .create-lists-wrapper .create-lists-overlay .add-key {
         display: block;
         margin: 0 auto;
@@ -242,22 +262,23 @@ body, html {
         height: 20px;
         font-size: 18px;
         padding: 5px 10px;
-        background-color: #747474;
+        background-color: #2CCCC5;
         border: 1px solid #535353;
         cursor: pointer;
         border-radius: 2px;
         text-align: center; }
         .create-lists .create-lists-wrapper .create-lists-overlay .next-btn:hover {
-          background-color: #04d765; }
+          background-color: #007375; }
 
 .template-info {
   border: 1px solid black;
-  padding: 15px; }
+  padding: 15px;
+  background-color: #2CCCC5; }
   .template-info:hover {
-    background-color: #49484c; }
+    background-color: #2CCCC5; }
   .template-info .template-name {
     font-size: 18px;
-    color: #747474; }
+    color: black; }
     .template-info .template-name .template-desc {
       font-style: italic;
       font-size: 12px; }
@@ -269,28 +290,26 @@ body, html {
       padding-top: 3.5px;
       padding-left: 2px;
       height: 25px;
-      border: 1px solid #747474;
+      border: 1px solid black;
       border-radius: 100%; }
     .template-info .template-name:hover {
       cursor: pointer;
-      color: #04d765; }
+      color: #007375; }
       .template-info .template-name:hover .show-template {
-        border-color: #04d765;
-        color: #04d765; }
+        border-color: #007375;
+        color: #007375; }
   .template-info .complete-list {
     display: none;
-    width: 50px;
-    height: 20px;
-    font-size: 18px;
-    padding: 5px 10px;
-    background-color: #00a533;
     margin-left: 100px;
-    border: 1px solid #535353;
-    cursor: pointer;
-    border-radius: 2px; }
+    margin-top: 15px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    color: black;
+    border: 2px solid black;
+    background-color: #A2CFA6; }
     .template-info .complete-list:hover {
-      background-color: #db2121;
-      color: white; }
+      cursor: pointer;
+      border-color: #f5c945; }
 
 .list-template {
   display: none;
@@ -303,7 +322,7 @@ body, html {
     .list-template .list .key .keys {
       font-weight: 100;
       font-size: 18px;
-      color: #04d765;
+      color: #007375;
       padding: 0 10px; }
       .list-template .list .key .keys .checkmark {
         width: 25px;
@@ -315,7 +334,7 @@ body, html {
       text-align: center; }
     .list-template .list .item td {
       font-size: 16px;
-      color: white; }
+      color: black; }
     .list-template .list .item .edit-item {
       display: none; }
       .list-template .list .item .edit-item .remove-list-item img {
@@ -325,28 +344,28 @@ body, html {
         .list-template .list .item .edit-item .remove-list-item img:hover {
           cursor: pointer; }
       .list-template .list .item .edit-item .edit-item {
-        color: #747474; }
+        color: black; }
         .list-template .list .item .edit-item .edit-item:hover {
           cursor: pointer;
-          color: #04d765;
+          color: #007375;
           font-weight: 700;
           text-decoration: underline; }
     .list-template .list .notes {
       font-style: italic;
       display: none;
       font-size: 12px;
-      color: white; }
+      color: black; }
   .list-template .set-all-checked {
     margin-top: 15px;
     text-transform: uppercase;
     margin-left: 100px;
     margin-right: 50px;
     text-align: center;
-    color: #747474;
+    color: black;
     font-weight: 800; }
     .list-template .set-all-checked:hover {
       cursor: pointer;
-      color: #04d765;
+      color: #007375;
       text-decoration: underline; }
   .list-template .set-all-unchecked {
     margin-top: 15px;
@@ -354,11 +373,11 @@ body, html {
     margin-left: 100px;
     margin-right: 50px;
     text-align: center;
-    color: #747474;
+    color: black;
     font-weight: 800; }
     .list-template .set-all-unchecked:hover {
       cursor: pointer;
-      color: #04d765;
+      color: #007375;
       text-decoration: underline; }
   .list-template #add-item-to-list {
     margin-top: 25px;
@@ -370,14 +389,14 @@ body, html {
     text-transform: uppercase;
     padding: 5px 10px;
     color: black;
-    border: 1px solid black;
-    background-color: #747474; }
+    border: 2px solid black;
+    background-color: #2CCCC5; }
     .list-template .btn-edit:hover {
       cursor: pointer;
-      background-color: #04d765; }
+      border-color: #f5c945; }
 
 .remove-item {
-  color: #3f3e42;
+  color: #bbe8bf;
   display: none;
   padding: 0 10px;
   cursor: default; }
@@ -400,5 +419,90 @@ body, html {
   .custom-checkbox:hover {
     border-width: 0;
     border-color: rgba(0, 0, 0, 0.5); }
+
+.calendar-container {
+  table-layout: fixed;
+  margin: 2.5%;
+  margin-bottom: 0;
+  width: 95%;
+  height: 100%; }
+  .calendar-container .month-label {
+    text-align: left;
+    font-size: 25px; }
+    .calendar-container .month-label .year-label {
+      font-weight: 200; }
+  .calendar-container .week-header {
+    font-weight: 200;
+    text-align: right; }
+    .calendar-container .week-header .weekend-header {
+      color: black; }
+  .calendar-container .day-container {
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+    text-align: right;
+    vertical-align: text-top;
+    height: 200px;
+    border-collapse: collapse; }
+    .calendar-container .day-container .date {
+      font-size: 18px;
+      top: 15px;
+      padding: 15px; }
+    .calendar-container .day-container .calendar-event {
+      background-color: aqua;
+      padding-right: 5px;
+      padding-left: 5px;
+      text-align: left;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      opacity: 0.75;
+      border-radius: 10px;
+      display: flex; }
+      .calendar-container .day-container .calendar-event .calendar-event-name {
+        padding: 0;
+        margin: 0;
+        -webkit-align-self: flex-start;
+        align-self: flex-start; }
+      .calendar-container .day-container .calendar-event .calendar-event-time {
+        background-color: #00b4b4;
+        border-radius: 10px;
+        margin-right: -5px;
+        margin-left: -5px;
+        padding-right: 5px;
+        padding-left: 5px;
+        margin-bottom: -2px;
+        margin-top: -2px;
+        margin-left: auto; }
+
+.create-calendar-event {
+  display: none; }
+  .create-calendar-event .create-calendar-event-container {
+    border-radius: 5px;
+    background-color: whitesmoke;
+    padding: 25px;
+    width: 450px;
+    height: 750px; }
+  .create-calendar-event .create-calendar-event-info {
+    background-color: white;
+    width: 400px;
+    height: 650px;
+    padding: 25px; }
+  .create-calendar-event .triangle-up {
+    width: 0;
+    z-index: 100;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 25px solid whitesmoke; }
+  .create-calendar-event input {
+    padding: 5px 10px;
+    margin-bottom: 15px; }
+  .create-calendar-event select {
+    margin-bottom: 15px; }
+  .create-calendar-event .scheduele-selector {
+    float: right; }
 
 /*# sourceMappingURL=main.css.map */

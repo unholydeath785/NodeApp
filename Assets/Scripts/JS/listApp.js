@@ -157,7 +157,7 @@ function toggleAddedList(ele) {
     $(ele).parent().find('.show-template').css("transition","transform 0.5s");
   } else {
     $(ele).parent().prop("data-showing","true");
-    $(ele).parent().find('.template-name').css("color","#04D765");
+    $(ele).parent().find('.template-name').css("color","#007375");
     $(ele).parent().find('.show-template').css("transform","rotate(90deg)");
     $(ele).parent().find('.show-template').css("transition","transform 0.5s");
   }
@@ -171,12 +171,12 @@ function toggleCheckMark(ele) {
   var listName = $(ele).parent().parent().parent().parent().parent().parent().prop("id");
   var list = getList(listName);
   var id = "#" + $(ele).parent().parent().prop("id");
-  if (source == "file:///Users/EvanCoulson/github/NodeApp/Assets/Images/CheckMark.png") {
-    $(ele).prop("src","Assets/Images/Xmark.png");
+  if (source == "file:///Users/evancoulson/github/NodeApp/Assets/Images/CheckMark.png") {
+    $(ele).prop("src","./Assets/Images/Xmark.png");
     list.items[index].isChecked = false;
     $(parentTemplate + ' ' + id + ' .completed .remove-item').hide(100);
   } else {
-    $(ele).prop("src","Assets/Images/CheckMark.png");
+    $(ele).prop("src","./Assets/Images/CheckMark.png");
     list.items[index].isChecked = true;
     $(parentTemplate + ' ' + id + ' .completed .remove-item').show(100);
   }
@@ -186,10 +186,9 @@ function toggleCheckMark(ele) {
     $(ele).parent().parent().parent().parent().parent().slideToggle(500,function() {
       var parentId = "#"+$(this).parent().prop("id");
       $(this).parent().prop("data-showing","false");
-      $(parentId + ' .template-info .template-name').css("color","rgb(116,116,116)");
+      $(parentId + ' .template-info .template-name').css("color","#07823F");
       $(parentId + ' .template-info .template-name .show-template').css("transform","initial");
       $(parentId + ' .template-info .template-name .show-template').css("transition","transform 0.5s");
-      $(parentId + ' .template-info .complete-list').fadeIn(100);
     });
   } else {
     var parentId = "#" + $(this).parent().parent().parent().parent().parent().parent().prop("id");
@@ -223,6 +222,8 @@ var id3 = 0;
 function nextSlide (ele) {
   $(ele).parent().hide();
   var id = $(ele).parent().prop("id");
+  var idInt = parseInt(id);
+  idInt += 1;
   nextCreatePannel(id)
   disableNextSlideButton(''+idInt+'')
   if (id == "3") {
@@ -235,6 +236,8 @@ $('.add-btn-key').click(function () {
   disableNextSlideButton('2')
   var keyTemplate = '<div class="key-placeholder"><label class="input-label">Key Name: </label><span class="remove-key-input" onclick="removeKey(this);"><img src="Assets/Images/Xmark.png"></span><input id="'+id2+'" class="create-list-input-1" name="name" type="text" placeholder="Key Name..."/><br></div>'
   $('.add-key').append(keyTemplate);
+  var id = '#'+(id2);
+  $('.add-key').find(id).focus()
 })
 
 $('.add-btn-item').click(function () {
@@ -248,6 +251,8 @@ $('.add-btn-item').click(function () {
   }
   itemTemplate += '</div><br class="break">'
   $('.add-item').append(itemTemplate);
+  var id = '#'+(id3);
+  $('.add-key').find(id).focus();
 })
 
 $('.edit-lists-close').click(function () {
@@ -285,6 +290,7 @@ function showEditMenu(ele) {
   var listName =  $(ele).parent().parent().prop("id");
   editList = getList(listName);
   $("#add-item-to-list").slideToggle(100);
+  $(ele).parent().parent().find('.complete-list').fadeToggle(100);
 }
 
 function removeListItem(ele) {
@@ -305,9 +311,9 @@ function setAllChecked(ele) {
   var list = getList(thisListName);
   for (var i = 0; i < list.items.length; i++) {
     var uniqueID = "#" +(i+1)
-    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/Xmark.png")
-    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox")
-    toggleCheckMark(checkMarkEle)
+    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/Xmark.png");
+    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox");
+    toggleCheckMark(checkMarkEle);
   }
 }
 
@@ -315,9 +321,9 @@ function setAllUnchecked(ele) {
   var thisListName = $(ele).parent().parent().prop("id");
   var list = getList(thisListName);
   for (var i = 0; i < list.items.length; i++) {
-    var uniqueID = "#" +(i+1)
-    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/CheckMark.png")
-    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox")
+    var uniqueID = "#" +(i+1);
+    $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox").prop("src","Assets/Images/CheckMark.png");
+    var checkMarkEle = $(ele).parent().find(".list").find(uniqueID).find(".completed").find(".custom-checkbox");
     toggleCheckMark(checkMarkEle)
   }
 }
@@ -328,6 +334,7 @@ function getData(keyLength,itemLength) {
   $('.create-lists-wrapper').hide();
   var name = $('.create-list-input-1').val()
   var desc = $('.create-list-input-2').val();
+  desc += "    ";
   var newList = new List(name,desc);
   var listKeys = [];
   var itemList = [];
@@ -595,12 +602,18 @@ function disableNextSlideButton(id) {
 
 function validateName(ele) {
   var name = $('.create-list-input-1').val()
-  if (name.length > 0) {
-    for (var i = 0; i < listArray.length; i++) {
-      var list = listArray[i];
-      if (list.name != name) {
-        nextSlide(ele)
-      }
+  if (listArray.length > 0) {
+    if (name.length > 0) {
+        for (var i = 0; i < listArray.length; i++) {
+          var list = listArray[i];
+          if (list.name != name) {
+            nextSlide(ele)
+          }
+        }
+    }
+  } else {
+    if (name.length > 0) {
+      nextSlide(ele)
     }
   }
 }
@@ -617,7 +630,29 @@ function validateItems(ele) {
   }
 }
 
+window.onresize = function (event) {
+  resizeDiv();
+}
+
+function resizeDiv() {
+  var vpw = $(window).width();
+  var vph = $(window).innerHeight();
+  vph -= 724;
+  $('.eye-candy').css({
+    top:vph+'px'
+  });
+}
+
+$(document).keyup(function(e) {
+  if (e.keyCode == 27) {
+    $('.create-lists-wrapper').slideUp(200);
+    $('.add-item-wrapper').slideUp(200);
+    $('.edit-item-wrapper').slideUp(200);
+  }
+})
+
 //onready
 $(document).ready(function () {
   loadJSONData();
+  resizeDiv();
 });

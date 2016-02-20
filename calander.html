@@ -8,12 +8,72 @@
   <body>
     <header class="header">
     </header>
-    <section class="calender-section">
+    <section class="calendar-section">
+      <span class="prev-month" onclick="calendarApp.changeMonth(-1)">Prev Month</span>
+      <span class="next-month" onclick="calendarApp.changeMonth(1)">Next Month</span>
+    </section>
+    <section class="create-calendar-event">
+      <div class="create-calendar-event-container">
+        <div class="triangle-up"></div>
+        <div class="create-calendar-event-info">
+          <label>Title: </label><input type="input" name="name" placeholder="Event Name...">
+          <select class="scheduele-selector" name="schedueleSelector"></select>
+          <br>
+          <label>Date: </label><input type="text" name="date" placeholder="Insert Date...">
+          <br>
+          <label>From: </label><input type="text" name="time1" value=""><label> To </label><input type="text" name="time2" value="">
+          <br>
+          <label>Repeat: </label><select class="repeat-selector" name="repeatSelector">
+            <option value="Every Hour">Every Hour</option>
+            <option value="Every Day">Every Day</option>
+            <option value="Every Week">Every Week</option>
+            <option value="Every Month">Every Month</option>
+            <option value="Every Year">Every Years</option>
+            <option class="divider" disabled role="separator">_______________</option>
+            <option value="Custom">Custom...</option>
+          </select>
+          <br>
+          <label>Alert: </label><select class="alert-selector" name="alertSelector">
+            <option value="Every Hour">Time of event</option>
+            <option value="Every Day">5 minutes before</option>
+            <option value="Every Week">15 minutes before</option>
+            <option value="Every Month">30 minutes before</option>
+            <option value="Every Year">1 hour before</option>
+            <option value="Every Year">1 day before</option>
+            <option class="divider" disabled role="separator">___________________</option>
+            <option value="Custom">Custom...</option>
+          </select>
+          <br>
+          <label>Travel Time: </label><input type="type" name="traveltime" value="" placeholder="Travel Time...">
+          <br>
+          <label>Invite Persons: </label><input type="text" name="name" value="" placeholder="Insert usernames...">
+          <div class="invite-containers">
 
+          </div>
+          <br>
+          <label>Location: </label><input type="text" name="location" value="" placeholder="Location...">
+          <div class="location-containers">
+
+          </div>
+          <br>
+          <label>Notes: </label><br><textarea name="notes" rows="8" cols="40" placeholder="Insert Notes..."></textarea>
+          <br>
+          <label>Url: </label><input type="text" name="name" value="" placeholder="URL...">
+          <div class="urls-containers">
+
+          </div>
+          <br>
+          <label>Attachments: </label><input type="file" name="file-upload">
+          <br>
+          <label>Lists:</label><select class="list-selector" name="listSelector"></select>
+        </div>
+        <br>
+        <input type="button" name="createEvent" disabled="true" value="Create Event">
+      </div>
     </section>
     <script charset="utf-8">window.$ = window.jQuery = require('./Assets/Scripts/JS/jquery.js');</script>
     <script src="Assets/Scripts/JS/header.js" charset="utf-8"></script>
-    <script src="Assets/Scripts/JS/calendar.js" charset="utf-8"></script> 
+    <script src="Assets/Scripts/JS/calendar.js" charset="utf-8"></script>
   </body>
 
 </html>

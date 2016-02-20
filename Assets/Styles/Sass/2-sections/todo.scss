@@ -1,12 +1,19 @@
 .todo {
-  background-color:$background-color-norm + 50;
+  background-color: rgb(240,240,240);
+  width:100%;
+  height: 100%;
   .list-templates {
+    min-height: 100%;
+    height: 100%;
+    width: 100%;
     .existing-lists {
+      background-color: rgb(204, 175, 26);
       border: 1px solid black;
       padding: 25px 15px;
       .title-lists {
-        font-size: 18px;
-        color: $font-color-norm + 100;
+        font-size:20px;
+        font-weight: 700;
+        color: black;
       }
     }
     .list-template-container {
@@ -50,16 +57,15 @@
           }
         }
         .btn-save {
-          margin-left:15px;
           margin-top:15px;
           text-transform: uppercase;
           padding:5px 10px;
           color: black;
-          border: 1px solid black;
-          background-color: $font-color-norm;
+          border: 2px solid black;
+          background-color: $list-color;
           &:hover {
             cursor: pointer;
-            background-color: $font-color-active
+            border-color:$btn-active;
           }
         }
         .edit-lists-close {
@@ -153,5 +159,18 @@
         }
       }
     }
+  }
+}
+
+.eye-candy {
+  width: 100%;
+  z-index: -100;
+  position: absolute;
+  .eye-candy-image {
+    background-image:url('../../../Assets/Images/eye-candy.png');
+    background-position: bottom left;
+    // background-size: cover;
+    background-repeat: repeat-x;
+    height: 724px;
   }
 }
