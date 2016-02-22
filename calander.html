@@ -11,6 +11,7 @@
     <section class="calendar-section">
       <span class="prev-month" onclick="calendarApp.changeMonth(-1)">Prev Month</span>
       <span class="next-month" onclick="calendarApp.changeMonth(1)">Next Month</span>
+
     </section>
     <section class="create-calendar-event">
       <div class="create-calendar-event-container">
@@ -19,9 +20,15 @@
           <label>Title: </label><input type="input" name="name" placeholder="Event Name...">
           <select class="scheduele-selector" name="schedueleSelector"></select>
           <br>
-          <label>Date: </label><input type="text" name="date" placeholder="Insert Date...">
+          <label class="tooltip">Date: <input type="text" name="date1" placeholder="Insert Date..."/><span class="tooltip-container">DD-MM-YYYY</span></label>
+          <span name="date2">To</span>
+          <label name="date2" class="tooltip"><input type="text" name="date2" placeholder="Insert Date..."/><span class="tooltip-container">DD-MM-YYYY</span></label>
           <br>
-          <label>From: </label><input type="text" name="time1" value=""><label> To </label><input type="text" name="time2" value="">
+          <label>Multiple Days: </label><input type="checkbox" name="longevent"></input>
+          <label>All Day: </label><input type="checkbox" name="allday"></input>
+          <br>
+          <label class="tooltip">From: <input type="text" name="time1" value=""><span class="tooltip-container">HH:MM AM</span></label> To
+          <label class="tooltip"><input type="text" name="time2" value=""><span class="tooltip-container special">HH:MM AM</span></label>
           <br>
           <label>Repeat: </label><select class="repeat-selector" name="repeatSelector">
             <option value="Every Hour">Every Hour</option>
@@ -34,41 +41,47 @@
           </select>
           <br>
           <label>Alert: </label><select class="alert-selector" name="alertSelector">
-            <option value="Every Hour">Time of event</option>
-            <option value="Every Day">5 minutes before</option>
-            <option value="Every Week">15 minutes before</option>
-            <option value="Every Month">30 minutes before</option>
-            <option value="Every Year">1 hour before</option>
-            <option value="Every Year">1 day before</option>
+            <option value="Time of">Time of event</option>
+            <option value="5 before">5 minutes before</option>
+            <option value="15 before">15 minutes before</option>
+            <option value="30 before">30 minutes before</option>
+            <option value="1 hour">1 hour before</option>
+            <option value="1 day">1 day before</option>
             <option class="divider" disabled role="separator">___________________</option>
             <option value="Custom">Custom...</option>
           </select>
           <br>
-          <label>Travel Time: </label><input type="type" name="traveltime" value="" placeholder="Travel Time...">
+          <label class="tooltip">Travel Time: <input type="text" name="traveltime" value="" placeholder="Travel Time..."><span class="tooltip-container">Minutes</span></label>
           <br>
-          <label>Invite Persons: </label><input type="text" name="name" value="" placeholder="Insert usernames...">
-          <div class="invite-containers">
+          <label>Invite Persons: </label><input type="text" onkeyup="calendarApp.invitePeopleEvent(event,this)" name="username" value="" placeholder="Insert usernames...">
+          <div class="invite-container">
 
           </div>
           <br>
-          <label>Location: </label><input type="text" name="location" value="" placeholder="Location...">
-          <div class="location-containers">
-
-          </div>
+          <label class="tooltip">Location: <input type="text" name="location" value="" placeholder="Location..."><span class="tooltip-container">Address Format</span></label>
           <br>
           <label>Notes: </label><br><textarea name="notes" rows="8" cols="40" placeholder="Insert Notes..."></textarea>
           <br>
-          <label>Url: </label><input type="text" name="name" value="" placeholder="URL...">
-          <div class="urls-containers">
-
+          <label>Url: </label><input onkeyup="calendarApp.checkURLInputOnEnter(event,this)" type="text" name="links" value="" placeholder="URL...">
+          <div class="urls-container">
           </div>
           <br>
           <label>Attachments: </label><input type="file" name="file-upload">
           <br>
-          <label>Lists:</label><select class="list-selector" name="listSelector"></select>
+          <label>Lists: </label><select class="list-selector" name="listSelector"></select>
         </div>
         <br>
-        <input type="button" name="createEvent" disabled="true" value="Create Event">
+        <input type="button" name="createEvent" value="Create Event">
+      </div>
+    </section>
+
+    <section class="hidden-iframe-overlay">
+      <div class="hidden-iframe-container">
+        <div class="nav-overlay">
+          <span class="back"> < Back </span>
+          <h1 class="website-name" style="text-align:center;text-transform: uppercase;font-size:36px;">Website Name</h1>
+        </div>
+        <iframe class="hidden-iframe" src=""></iframe>
       </div>
     </section>
     <script charset="utf-8">window.$ = window.jQuery = require('./Assets/Scripts/JS/jquery.js');</script>

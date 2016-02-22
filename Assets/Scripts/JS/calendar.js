@@ -1,8 +1,22 @@
 var jsonfile = require('jsonfile');
 var request = require('request');
 
+//Add function to Date class
+Date.prototype.addHours = function (hours) {
+  if (hours + this.getHours() > 24) {
+    var tomorrow = new Date(new Date.getTime() + 24 * 60 * 60 * 1000);
+    return tomorrow;
+  } else {
+    this.setTime(this.getTime()+(hours*60*60*1000))
+    return this;
+  }
+};
+
+
 var calendarApp = (function ($) {
   //Gloabl for fall back in case of nessacary excess functions
+  var longEventIsChecked = false;
+  var allDayIsChecked = false;
   var CalendarEventsArray = []
   var cal_days_labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var cal_months_labels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -27,10 +41,26 @@ var calendarApp = (function ($) {
   // ||      Calendar Declaration    ||
   // ||                              ||
   // ==================================
-  var cal = new Calendar(2,2016);
+  var cal = new Calendar(1,2016);
 
   Calendar.prototype.generateHtmlSkeleton = function () {
     //variables
+    var previousYear = this.year;
+    var nextYear = this.year;
+    var previousMonth = this.month - 1;
+    var nextMonth = this.month + 1;
+    //check if previous and next month are out side of index bounds
+    if (previousMonth < 0) {
+      previousMonth = 11;
+      previousYear--;
+    }
+    if (nextMonth > 11) {
+      nextMonth = 0;
+      nextYear++;
+    }
+
+    var daysInMonthBefore = cal_days_in_months[previousMonth];
+    var daysInMonthAfter = cal_days_in_months[nextMonth];
     var firstDay = new Date(this.year,this.month,1);
     var startingDay = firstDay.getDay();
     var monthLength = cal_days_in_months[this.month];
@@ -38,9 +68,11 @@ var calendarApp = (function ($) {
     var day = 1;
 
     //compensate for leap year
-    if (this.month == 1) {
-      if ((this.year % 4 == 0 && this.year % 100 != 0) || this.year % 400 == 0) {
+    if ((this.year % 4 == 0 && this.year % 100 != 0) || this.year % 400 == 0) {
+      if (this.month == 1) {
         monthLength = 29;
+      } else if (this.month == 2) {
+        daysInMonthBefore = 29;
       }
     }
 
@@ -62,12 +94,28 @@ var calendarApp = (function ($) {
       }
     }
     html += '</tr><tr class="week-container">';
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < Math.ceil((monthLength + startingDay) / 7); i++) {
       for (var j = 0; j < 7; j++) {
-        html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(day+'-'+this.month+'-'+this.year)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
-        if (day <= monthLength && (i > 0 || j >= startingDay)) {
-          html += '<span class="date">'+day+'</span>';
-          day ++;
+        if (day <= monthLength) {
+          if ((i > 0 || j >= startingDay)) {
+            // Days of this month
+            html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(day+'-'+this.month+'-'+this.year)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
+            html += '<span class="date">'+day+'</span>';
+            day ++;
+          }
+          else {
+            // Last days of previous month
+            var prevDays = (daysInMonthBefore - (startingDay - 1) + j);
+            html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(prevDays+'-'+(previousMonth)+'-'+previousYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
+            html += '<span class="outside-of-day-range">'+prevDays+'</span>';
+          }
+        }
+        else {
+          // First days of next month
+          var nextDays = day - monthLength;
+          html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(nextDays+'-'+(nextMonth)+'-'+nextYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
+          html += '<span class="outside-of-day-range">'+nextDays+'</span>';
+          day++;
         }
         html += '</td>';
       }
@@ -118,13 +166,27 @@ var calendarApp = (function ($) {
   //||                                    ||
   //========================================
 
-  function CalendarEvent(name,year,month,day,hour,minute) {
+  function CalendarEvent(name,date,date1) {
     this.name = name;
-    this.year = year;
-    this.month = month;
-    this.day = day;
-    this.hour = hour;
-    this.minute = minute;
+    this.year = date.getFullYear();
+    this.month = date.getMonth();
+    this.day = date.getDate();
+    this.hour = date.getHours();
+    this.minute = date.getMinutes();
+    this.endYear = date1.getFullYear();
+    this.endMonth = date1.getMonth();
+    this.endDay = date1.getDate();
+    this.endHour = date1.getHours();
+    this.endMinute = date1.getMinutes();
+    this.repeat = null;
+    this.alert = null;
+    this.travelTime = null;
+    this.invitees = null;
+    this.location = null;
+    this.notes = null;
+    this.url = null;
+    this.attachmentFile = null;
+    this.lists = null;
     this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
     this.html = '';
     CalendarEventsArray.push(this);
@@ -143,7 +205,8 @@ var calendarApp = (function ($) {
   var ignition = function () {
     cal.generateHtmlSkeleton();
     $('.calendar-section').append(cal.getHtmlSkeleton())
-    var calEvent = new CalendarEvent("Test",2016,2,18,10,30)
+    var date = new Date(2016,1,18,10,30,60,1000);
+    var calEvent = new CalendarEvent("Test",date,date);
     calEvent.generateHtmlSkeleton();
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
   }
@@ -151,6 +214,8 @@ var calendarApp = (function ($) {
   var updateMonth = function (changeMonthVal) {
     cal.changeMonth(changeMonthVal);
   }
+
+  // Drag n' drop
 
   var dragEle = function (ev) {
     ev.dataTransfer.setData("text",ev.target.id)
@@ -166,10 +231,13 @@ var calendarApp = (function ($) {
     ev.preventDefault();
   }
 
+  // open calevent creation pannel
+
   var createList = function (ele,event) {
     var section = $('.create-calendar-event');
     var triangle = $('.triangle-up');
-    console.log(event.clientY)
+    var id = $(ele).prop("id");
+    var id2 = $(ele).next().prop("id");
     section.css({
       position:"absolute",
       top: event.clientY + 25,
@@ -186,7 +254,317 @@ var calendarApp = (function ($) {
       section.fadeIn("slow");
       triangle.fadeIn("slow");
     })
+    populateCalEventMenu(id,id2);
   }
+
+  // Create Cal events
+
+  var populateCalEventMenu = function(id,id2) {
+    //variables
+    var cssID = id;
+    var nextCssID = id2;
+    var today = new Date();
+
+    //get default values
+    var defaultTitle = "Untitled"
+    var date1 = getDate(cssID);
+    var date2 = getDate(nextCssID);
+    var time1 = getTime(today);
+    var time2 = getTime(today.addHours(1))
+
+    //insert to menu
+    $('[name="name"]').val(defaultTitle);
+    $('[name="date1"]').val(date1);
+    $('[name="date2"]').val(date2);
+    $('[name="time1"]').val(time1);
+    $('[name="time2"]').val(time2);
+  }
+
+  var getCalEventMenuData = function () {
+    //get values from input
+    var title = $('[name="name"]').val();
+    var date1 = $('[name="date1"]').val();
+    var date2 = '';
+    date1 = parseDate(date1);
+    if ($('[name="longevent"]').prop("checked")) {
+      date2 = $('[name="date2"]').val();
+      date2 = parseDate(date2);
+      var year1 = getYear(date1);
+      var month1 = getMonth(date1);
+      var day1 = getDay(date1);
+      var hour1 = getHour(time1);
+      var minute1 = getMinute(time1);
+      var date1 = createDate(year,month,day,hour,minute);
+    }
+    var time1 = $('[name="time1"]').val();
+    var time2 = $('[name="time2"]').val();
+
+    //convert values
+    var year = getYear(date1);
+    var month = getMonth(date1);
+    var day = getDay(date1);
+    var hour = getHour(time1);
+    var minute = getMinute(time1);
+    var date = createDate(year,month,day,hour,minute);
+    var calEvent;
+    if (date2 != '') {
+      calEvent = new CalendarEvent(title,date1,date2);
+    } else {
+      calEvent = new CalendarEvent(title,date,date);
+    }
+
+    //get extra info
+    var repeat = $('[name=repeatSelector]').val();
+    var alert = $('[name=alertSelector]').val();
+    var travelTime = $('[name=traveltime]').val();
+    var totalPeople = $('.invitee').length;
+    var totalURLS = $('.urls').length;
+    var invitees = getPeople(totalPeople);
+    var location = $('[name=location]').val();
+    var notes = $('[name=notes]').val();
+    var urls = getURLS(totalURLS);
+    var lists = $('[name=listSelector]').val();
+
+    //validate info
+    repeat = testIfEmpty(repeat);
+    alert = testIfEmpty(alert);
+    travelTime = testIfEmpty(travelTime);
+    invitees = testIfEmptyArray(invitees);
+    location = testIfEmpty(location);
+    notes = testIfEmpty(notes);
+    urls = testIfEmptyArray(urls);
+    lists = testIfEmpty(lists);
+
+    //insert into calendar
+    calEvent.repeat = repeat;
+    calEvent.alert = alert;
+    calEvent.travelTime = travelTime;
+    calEvent.invitees = invitees;
+    calEvent.location = location;
+    calEvent.notes = notes;
+    calEvent.url = urls;
+    calEvent.attachmentFile = null;
+    calEvent.lists = lists;
+  }
+
+  var testIfEmpty = function (variable) {
+    if (variable == '') {
+      variable = null;
+      return variable;
+    }
+    return variable;
+  }
+
+  var testIfEmptyArray = function (variable) {
+    if (variable.length == 0) {
+      variable = null;
+      return variable;
+    }
+    return variable;
+  }
+
+
+  var getURLS = function (totalLength) {
+    var valueArray = [];
+    for (var i = 0; i < totalLength; i++) {
+      var specialID = '#'+(i);
+      var value = $('.urls-container').find(specialID).text()
+      valueArray.push(value);
+    }
+    return valueArray;
+  }
+
+  var getPeople = function (totalLength) {
+    var valueArray = [];
+    for (var i = 0; i < totalLength; i++) {
+      var specialID = '#'+(i);
+      var value = $('.invite-container').find(specialID).text()
+      valueArray.push(value);
+    }
+    return valueArray;
+  }
+
+  var createDate = function (year,month,day,hour,minute) {
+    var date = new Date(year,month,day,hour,minute,60,1000);
+    return date;
+  }
+
+  var getYear = function (id) {
+    var valueArray = id.split(" ");
+    for (var i = 0; i < valueArray.length; i++) {
+      var value = valueArray[i];
+      valueArray[i] = value.replace(",","newchar");
+    }
+    console.log(valueArray[2]);
+    var year = parseInt(valueArray[2])
+    return year;
+  }
+
+  var getMonth = function (id) {
+    var valueArray = id.split(" ");
+    for (var i = 0; i < valueArray.length; i++) {
+      var value = valueArray[i];
+      valueArray[i] = value.replace(",","newchar");
+    }
+    for (var i = 0; i < cal_months_labels.length; i++) {
+      var monthName = cal_months_labels[i];
+      var monthAbbreviation = monthName.substring(0,3);
+      if (valueArray[0] == monthAbbreviation) {
+        valueArray[0] = i;
+      }
+    }
+    console.log(valueArray[0]);
+    var month = parseInt(valueArray[0])
+    return month;
+  }
+
+  var getDay = function (id) {
+    var valueArray = id.split(" ");
+    for (var i = 0; i < valueArray.length; i++) {
+      var value = valueArray[i];
+      valueArray[i] = value.replace(",","");
+    }
+    console.log(valueArray[1]);
+    var day = parseInt(valueArray[1]);
+    return day;
+  }
+
+  var getHour = function (id) {
+    var valueArray = id.split(":")
+    var array = valueArray[1].split(" ");
+    var timeOfDay = array[1];
+    if (timeOfDay == "PM") {
+      var base12Hours = valueArray[0];
+      var hours = parseInt(base12Hours);
+      hours = hours + 12;
+      console.log(hours);
+      return hours
+    } else {
+      var base12Hours = valueArray[0];
+      var hours = parseInt(base12Hours);
+      console.log(hours);
+      return hours;
+    }
+  }
+
+  var getMinute = function (id) {
+    var valueArray = id.split(":")
+    var array = valueArray[1].split(" ");
+    var minute = parseInt(array[0]);
+    if (!(isNaN(minute))) {
+      console.log(minute);
+      return minute;
+    }
+  }
+
+  var getDate = function (id) {
+    var date = parseDate(id);
+    return date;
+  }
+
+  var getTime = function (today) {
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+    var timeOfDay;
+    if (hours > 12) {
+      hours = hours - 12;
+      timeOfDay = "PM";
+    } else {
+      timeOfDay = "AM";
+    }
+    if (minutes < 10) {
+      minutes = "0"+minutes;
+    }
+    if (hours == 0) {
+      hours = 12;
+    }
+    var time = "" + hours + ":" + minutes + " " + timeOfDay;
+    return time
+  }
+
+  var parseDate = function (cssID) {
+    var id = cssID.replace("#","");
+    var dateValueArray = id.split("-");
+    if (dateValueArray.length > 1) {
+      var day = dateValueArray[0];
+      var month = dateValueArray[1];
+      var year = dateValueArray[2];
+      month = cal_months_labels[month];
+      month = month.substring(0,3);
+      id = month + " " + day + ", " + year;
+      return id;
+    }
+    return cssID
+  }
+
+  var invitePeopleInputEvent = function (event,ele) {
+    if (event.keyCode == 13) {
+      var totalPeople = $('.invitee').length;
+      var value = '<span class="invitee"><span id="'+totalPeople+'">'+$(ele).val()+'</span><span onclick="calendarApp.removeInvitedPerson(this)" class="remove-invitee">X</span></span>';
+      $('.invite-container').append(value);
+      $(ele).val("");
+    }
+  }
+
+  var removeInvitee = function (ele) {
+    $(ele).parent().fadeOut(200,function () {
+      $(ele).parent().remove();
+    })
+  }
+
+  var addUrlToContainerOnEnter = function (event,ele) {
+    if (event.keyCode == 13) {
+      var totalURLS = $('.url').length;
+      var value = '<span class="url"><span id="'+totalURLS+'">'+$(ele).val()+'</span><span onclick="calendarApp.removeInvitedPerson(this)" class="remove-invitee">X</span></a>';
+      $('.urls-container').append(value);
+      $(ele).val("");
+    }
+  }
+
+  var showHiddenIFrame = function (ele) {
+    var value = $(ele).text();
+    var link = value.split(" ")
+    value = link[1];
+    var websiteName = getWebsiteName(link[1]);
+    $('.hidden-iframe-container').slideDown(200);
+    $('.website-name').text(websiteName);
+    $('.hidden-iframe').prop("src",value)
+  }
+
+  var getWebsiteName = function (url) {
+    var valueArray = url.split(":");
+    valueArray = valueArray[1].split(".");
+    valueArray = valueArray[0].split("/");
+    var name = valueArray[2];
+    return name;
+  }
+
+  //jQuery checkmark events to toggle creation objects
+
+  $('[name="longevent"]').click(function () {
+    if ($(this).prop("checked")) {
+      $("[name=date2]").fadeIn(200);
+    } else {
+      $("[name=date2]").fadeOut(200);
+    }
+  })
+
+  $('[name="allday"]').click(function() {
+    if ($(this).prop("checked")) {
+      $('[name="time1"]').val("12:00 AM");
+      $('[name="time2"]').val("11:59 PM");
+    }
+  })
+
+  //check if button clicked
+
+  $('[name="createEvent"]').click(function () {
+    if (!($(this).prop("disabled"))) {
+      getCalEventMenuData();
+    }
+  })
+
+  //close calevent creation on esc key
 
   $(document).keyup(function(e) {
     if (e.keyCode == 27) {
@@ -194,15 +572,10 @@ var calendarApp = (function ($) {
     }
   })
 
-  $('body').click(function () {
-    $('table').click(function () {
-      return false;
-    })
-    $('.create-calendar-event').click(function () {
-      return false;
-    })
-    $('.create-calendar-event').fadeOut("slow");
-    return true;
+  //back to calendar
+  $('.back').click(function () {
+    $('.hidden-iframe-container').slideUp(200);
+    $('.hidden-iframe').prop("src","");
   })
 
   //return
@@ -212,7 +585,11 @@ var calendarApp = (function ($) {
     drag: dragEle,
     drop: dropEle,
     allowDrop: allowDropEle,
-    createListMenu: createList
+    createListMenu: createList,
+    invitePeopleEvent: invitePeopleInputEvent,
+    removeInvitedPerson: removeInvitee,
+    checkURLInputOnEnter: addUrlToContainerOnEnter,
+    loadHiddenIFrame: showHiddenIFrame
   };
 
 })(jQuery);
