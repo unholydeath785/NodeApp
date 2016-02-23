@@ -17,7 +17,7 @@ var calendarApp = (function ($) {
   //Gloabl for fall back in case of nessacary excess functions
   var longEventIsChecked = false;
   var allDayIsChecked = false;
-  var CalendarEventsArray = []
+  var calendarEventsArray = []
   var cal_days_labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var cal_months_labels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var cal_days_in_months = [31,28,31,30,31,30,31,31,30,31,30,31];
@@ -187,13 +187,16 @@ var calendarApp = (function ($) {
     this.url = null;
     this.attachmentFile = null;
     this.lists = null;
+    var timeStamp = new Date(this.year,this.month,this.day,this.hour,this.minute,0,1000);
+    this.timeString = getTime(timeStamp);
     this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
     this.html = '';
-    CalendarEventsArray.push(this);
+    calendarEventsArray.push(this);
   }
 
   CalendarEvent.prototype.generateHtmlSkeleton = function () {
-    var html = '<div draggable="true" ondragstart="calendarApp.drag(event)" class="calendar-event" id="'+this.id+'"><span class="calendar-event-name">'+this.name+'</span><span class="calendar-event-time">'+this.hour+':'+this.minute+'</span></div>'
+    var html = '<div onclick="calendarApp.showCalEvent(this)" draggable="true" ondragstart="calendarApp.drag(event)" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'+this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span></div>'
+    
     this.html = html;
   };
 
@@ -201,11 +204,21 @@ var calendarApp = (function ($) {
     return this.html
   }
 
+  //getters
+
+  var getCalEventByID = function(id) {
+    for (var i = 0; i < calendarEventsArray.length; i++) {
+      if (calendarEventsArray[i].selectorID == id) {
+        return calendarEventsArray[i];
+      }
+    }
+  }
+
   //functions
   var ignition = function () {
     cal.generateHtmlSkeleton();
     $('.calendar-section').append(cal.getHtmlSkeleton())
-    var date = new Date(2016,1,18,10,30,60,1000);
+    var date = new Date(2016,1,18,10,30,0,1000);
     var calEvent = new CalendarEvent("Test",date,date);
     calEvent.generateHtmlSkeleton();
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
@@ -238,6 +251,7 @@ var calendarApp = (function ($) {
     var triangle = $('.triangle-up');
     var id = $(ele).prop("id");
     var id2 = $(ele).next().prop("id");
+
     section.css({
       position:"absolute",
       top: event.clientY + 25,
@@ -250,10 +264,8 @@ var calendarApp = (function ($) {
       left:200
     })
 
-    var delayTimer = setTimeout(function () {
-      section.fadeIn("slow");
-      triangle.fadeIn("slow");
-    })
+    section.fadeIn("slow");
+    triangle.fadeIn("slow");
     populateCalEventMenu(id,id2);
   }
 
@@ -385,7 +397,7 @@ var calendarApp = (function ($) {
   }
 
   var createDate = function (year,month,day,hour,minute) {
-    var date = new Date(year,month,day,hour,minute,60,1000);
+    var date = new Date(year,month,day,hour,minute,0,1000);
     return date;
   }
 
@@ -395,7 +407,6 @@ var calendarApp = (function ($) {
       var value = valueArray[i];
       valueArray[i] = value.replace(",","newchar");
     }
-    console.log(valueArray[2]);
     var year = parseInt(valueArray[2])
     return year;
   }
@@ -413,7 +424,6 @@ var calendarApp = (function ($) {
         valueArray[0] = i;
       }
     }
-    console.log(valueArray[0]);
     var month = parseInt(valueArray[0])
     return month;
   }
@@ -424,7 +434,6 @@ var calendarApp = (function ($) {
       var value = valueArray[i];
       valueArray[i] = value.replace(",","");
     }
-    console.log(valueArray[1]);
     var day = parseInt(valueArray[1]);
     return day;
   }
@@ -437,12 +446,10 @@ var calendarApp = (function ($) {
       var base12Hours = valueArray[0];
       var hours = parseInt(base12Hours);
       hours = hours + 12;
-      console.log(hours);
       return hours
     } else {
       var base12Hours = valueArray[0];
       var hours = parseInt(base12Hours);
-      console.log(hours);
       return hours;
     }
   }
@@ -452,7 +459,6 @@ var calendarApp = (function ($) {
     var array = valueArray[1].split(" ");
     var minute = parseInt(array[0]);
     if (!(isNaN(minute))) {
-      console.log(minute);
       return minute;
     }
   }
@@ -578,6 +584,19 @@ var calendarApp = (function ($) {
     $('.hidden-iframe').prop("src","");
   })
 
+  //showCalendarEvent
+  var showCalendarEvent = function (ele) {
+    setTimeout(hideCalMenuCreate, 1000);
+    var selectorID = $(ele).prop("id");
+    var calEvent = getCalEventByID(selectorID);
+    calEvent.generateHtmlSkeleton();
+
+  }
+
+  var hideCalMenuCreate = function () {
+    $('.create-calendar-event').hide();
+  }
+
   //return
   return {
     start: ignition,
@@ -589,7 +608,8 @@ var calendarApp = (function ($) {
     invitePeopleEvent: invitePeopleInputEvent,
     removeInvitedPerson: removeInvitee,
     checkURLInputOnEnter: addUrlToContainerOnEnter,
-    loadHiddenIFrame: showHiddenIFrame
+    loadHiddenIFrame: showHiddenIFrame,
+    showCalEvent: showCalendarEvent
   };
 
 })(jQuery);
