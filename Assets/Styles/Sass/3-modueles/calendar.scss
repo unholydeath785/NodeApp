@@ -23,7 +23,8 @@ body {
       color:$font-color-norm;
     }
   }
-  .day-container {
+  .day-container-weekend {
+    background-color: rgb(203, 202, 202);
     white-space: nowrap;
     overflow: hidden;
     border-right:1px solid $font-color-norm;
@@ -40,7 +41,63 @@ body {
       padding:15px;
     }
     .outside-of-day-range {
-      color:rgb(184, 184, 184)
+      color:rgb(158, 153, 153)
+    }
+    .calendar-event {
+      background-color:aqua;
+      padding-right:5px;
+      padding-left:5px;
+      text-align: left;
+      padding-top:2px;
+      padding-bottom: 2px;
+      opacity: 0.75;
+      border-radius: 10px;
+      display: flex;
+      .calendar-event-name {
+        padding: 0;
+        margin: 0;
+        -webkit-align-self: flex-start;
+        align-self: flex-start;
+      }
+      .calendar-event-time {
+        background-color: aqua - 75;
+        border-radius: 10px;
+        margin-right:-5px;
+        margin-left:-5px;;
+        padding-right: 5px;
+        padding-left:5px;
+        margin-bottom:-2px;
+        margin-top: -2px;
+        margin-left: auto;
+      }
+    }
+  }
+  .day-container {
+    white-space: nowrap;
+    overflow: hidden;
+    border-right:1px solid $font-color-norm;
+    border-left:1px solid $font-color-norm;
+    border-bottom:1px solid $font-color-norm;
+    border-top:1px solid $font-color-norm;
+    text-align: right;
+    vertical-align: text-top;
+    height:200px;
+    border-collapse: collapse;
+    .date {
+      font-size:18px;
+      top:20px;
+      padding:15px;
+    }
+    .date-active {
+      font-size:18px;
+      top:20px;
+      padding:25px;
+      border-radius:100px;
+      background-color: rgb(233, 34, 7);
+      color:rgb(224, 210, 13);
+    }
+    .outside-of-day-range {
+      color:rgb(158, 153, 153)
     }
     .calendar-event {
       background-color:aqua;
@@ -147,6 +204,7 @@ body {
   width: 100%;
   height: 100%;
   .hidden-iframe-container {
+    background-color: white;
     display: none;
     z-index: 10000;
     width: 100%;
@@ -186,3 +244,68 @@ body {
     }
   }
 }
+
+.popup-menu {
+  position: absolute;
+  top: 0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  .triangle-up {
+    width:0;
+    z-index: 101;
+    height:0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom:25px solid $background-color-norm;
+  }
+  .popup-menu-wrapper {
+    position: absolute;
+    text-align: center;
+
+    width: 400px;
+    height: 600px;
+    background-color: $background-color-norm;
+    opacity: 0.99;
+    border-radius: 5px;
+  }
+  .popup-menu-container {
+    background-color: white;
+    opacity: 1;
+    height: 550px;
+    width:350px;
+    margin-left:25px;
+  }
+}
+
+// this.name = name;
+// this.year = date.getFullYear();
+// this.month = date.getMonth();
+// this.day = date.getDate();
+// this.hour = date.getHours();
+// this.minute = date.getMinutes();
+// this.endYear = date1.getFullYear();
+// this.endMonth = date1.getMonth();
+// this.endDay = date1.getDate();
+// this.endHour = date1.getHours();
+// this.endMinute = date1.getMinutes();
+// if (date == date1) {
+//   this.oneDay = true;
+// } else {
+//   this.oneDay = false;
+// }
+// this.repeat = null;
+// this.alert = null;
+// this.travelTime = null;
+// this.invitees = null;
+// this.location = null;
+// this.notes = null;
+// this.url = null;
+// this.attachmentFile = null;
+// this.lists = null;
+// var timeStamp = new Date(this.year,this.month,this.day,this.hour,this.minute,0,1000);
+// this.timeString = getTime(timeStamp);
+// this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
+// this.selectorID = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
+// this.html = '';
