@@ -35,10 +35,23 @@ body {
     vertical-align: text-top;
     height:200px;
     border-collapse: collapse;
+    &:hover {
+      background-color: rgb(131, 131, 131);
+      cursor: pointer;
+    }
     .date {
       font-size:18px;
       top:15px;
       padding:15px;
+    }
+    .date-active {
+      position: relative;
+      font-size:18px;
+      top:10px;
+      padding:10px;
+      border-radius:100px;
+      background-color: rgb(233, 34, 7);
+      color:rgb(224, 210, 13);
     }
     .outside-of-day-range {
       color:rgb(158, 153, 153)
@@ -50,7 +63,6 @@ body {
       text-align: left;
       padding-top:2px;
       padding-bottom: 2px;
-      opacity: 0.75;
       border-radius: 10px;
       display: flex;
       .calendar-event-name {
@@ -83,15 +95,20 @@ body {
     vertical-align: text-top;
     height:200px;
     border-collapse: collapse;
+    &:hover {
+      cursor: pointer;
+      background-color: rgb(233, 233, 233);
+    }
     .date {
       font-size:18px;
-      top:20px;
       padding:15px;
     }
     .date-active {
+      z-index: 1;
+      position: relative;
       font-size:18px;
-      top:20px;
-      padding:25px;
+      top:10px;
+      padding:10px;
       border-radius:100px;
       background-color: rgb(233, 34, 7);
       color:rgb(224, 210, 13);
@@ -106,9 +123,11 @@ body {
       text-align: left;
       padding-top:2px;
       padding-bottom: 2px;
-      opacity: 0.75;
       border-radius: 10px;
       display: flex;
+      &:hover {
+        border:1px solid black;
+      }
       .calendar-event-name {
         padding: 0;
         margin: 0;
@@ -219,13 +238,28 @@ body {
       z-index: 1000;
       height:100px;
       .back {
-        left:1px;
         background-color:rgb(193, 193, 193);
         font-size: 35px;
         padding: 29px;
-        position: absolute;
+        position: relative;
+        float: left;
         border:1px solid black;
         width:100px;
+        color:$font-color-norm;
+        &:hover {
+          cursor: pointer;
+          color:$font-color-active;
+          background-color: $list-color;
+        }
+      }
+      .btn-refresh {
+        background-color:rgb(193, 193, 193);
+        font-size: 35px;
+        padding: 29px;
+        position: relative;;
+        border:1px solid black;
+        width:100px;
+        float:right;
         color:$font-color-norm;
         &:hover {
           cursor: pointer;
@@ -253,8 +287,9 @@ body {
   height: 100%;
   display: none;
   .triangle-up {
+    position: absolute;
     width:0;
-    z-index: 101;
+    z-index: 5000;
     height:0;
     border-left: 25px solid transparent;
     border-right: 25px solid transparent;
@@ -267,45 +302,12 @@ body {
     width: 400px;
     height: 600px;
     background-color: $background-color-norm;
-    opacity: 0.99;
     border-radius: 5px;
   }
   .popup-menu-container {
     background-color: white;
-    opacity: 1;
     height: 550px;
     width:350px;
     margin-left:25px;
   }
 }
-
-// this.name = name;
-// this.year = date.getFullYear();
-// this.month = date.getMonth();
-// this.day = date.getDate();
-// this.hour = date.getHours();
-// this.minute = date.getMinutes();
-// this.endYear = date1.getFullYear();
-// this.endMonth = date1.getMonth();
-// this.endDay = date1.getDate();
-// this.endHour = date1.getHours();
-// this.endMinute = date1.getMinutes();
-// if (date == date1) {
-//   this.oneDay = true;
-// } else {
-//   this.oneDay = false;
-// }
-// this.repeat = null;
-// this.alert = null;
-// this.travelTime = null;
-// this.invitees = null;
-// this.location = null;
-// this.notes = null;
-// this.url = null;
-// this.attachmentFile = null;
-// this.lists = null;
-// var timeStamp = new Date(this.year,this.month,this.day,this.hour,this.minute,0,1000);
-// this.timeString = getTime(timeStamp);
-// this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
-// this.selectorID = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
-// this.html = '';

@@ -41,7 +41,7 @@ var calendarApp = (function ($) {
   // ||      Calendar Declaration    ||
   // ||                              ||
   // ==================================
-  var cal = new Calendar(1,2016);
+  var cal = new Calendar(cal_current_date.getMonth(),cal_current_date.getFullYear());
 
   Calendar.prototype.generateHtmlSkeleton = function () {
     //variables
@@ -104,7 +104,7 @@ var calendarApp = (function ($) {
             } else {
               html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(day+'-'+this.month+'-'+this.year)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
             }
-            if (cal_current_date.getDate() == day) {
+            if (cal_current_date.getDate() == day && this.year == cal_current_date.getFullYear() && cal_current_date.getMonth() == this.month) {
               html += '<span class="date-active">'+day+'</span>';
             } else {
               html += '<span class="date">'+day+'</span>';
@@ -113,23 +113,23 @@ var calendarApp = (function ($) {
           }
           else {
             // Last days of previous month
+            var prevDays = (daysInMonthBefore - (startingDay - 1) + j);
             if (j == 0 || j == 6) {
-              html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(day+'-'+this.month+'-'+this.year)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container-weekend">';
+              html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(prevDays+'-'+previousMonth+'-'+previousYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container-weekend">';
             } else {
               html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(prevDays+'-'+(previousMonth)+'-'+previousYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
             }
-            var prevDays = (daysInMonthBefore - (startingDay - 1) + j);
             html += '<span class="outside-of-day-range">'+prevDays+'</span>';
           }
         }
         else {
+          var nextDays = day - monthLength;
           if (j == 0 || j == 6) {
             html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(nextDays+'-'+(nextMonth)+'-'+nextYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container-weekend">';
           } else {
             html += '<td onclick="calendarApp.createListMenu(this,event)" id="'+(nextDays+'-'+(nextMonth)+'-'+nextYear)+'" ondrop="calendarApp.drop(event)" ondragover="calendarApp.allowDrop(event)" class="day-container">';
           }
           // First days of next month
-          var nextDays = day - monthLength;
           html += '<span class="outside-of-day-range">'+nextDays+'</span>';
           day++;
         }
@@ -173,7 +173,12 @@ var calendarApp = (function ($) {
     this.generateHtmlSkeleton();
     var html = this.getHtmlSkeleton();
     $('.calendar-container').remove();
-    $('.calendar-section').append(cal.getHtmlSkeleton())
+    $('.calendar-section').append(cal.getHtmlSkeleton());
+    for (var i = 0; i < calendarEventsArray.length; i ++) {
+      var calEvent = calendarEventsArray[i];
+      calEvent.generateHtmlSkeleton();
+      $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
+    }
   };
 
   //========================================
@@ -218,7 +223,7 @@ var calendarApp = (function ($) {
 
   CalendarEvent.prototype.generateHtmlSkeleton = function () {
     var scrollOffsetY = (window.pageYOffset || document.scrollTop) - (document.clientTop || 0);
-    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'+this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span></div><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
+    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'+this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
     if (this.oneDay) {
       var date = getDate(this.selectorID);
       html += '<p class="menu-date">Date: '+date+'</p>';
@@ -262,7 +267,7 @@ var calendarApp = (function ($) {
     if (this.lists != null) {
       html += '<p class="menu-lists">Lists:'+this.lists+'</p>';
     }
-    html += '</div></div></div>'
+    html += '</div></div></div></div>';
     this.html = html;
   };
 
@@ -286,7 +291,7 @@ var calendarApp = (function ($) {
     $('.calendar-section').append(cal.getHtmlSkeleton())
     var date = new Date(2016,1,18,10,30,0,1000);
     var calEvent = new CalendarEvent("Test",date,date);
-    calEvent.url = ["http://cnn.com"];
+    calEvent.url = ["http://cnn.com","http://niceme.me"];
     calEvent.generateHtmlSkeleton();
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
   }
@@ -314,23 +319,41 @@ var calendarApp = (function ($) {
   // open calevent creation pannel
 
   var createList = function (ele,event) {
+    $('.popup-menu').hide(0);
     var section = $('.create-calendar-event');
     var triangle = $('.triangle-up');
     var id = $(ele).prop("id");
     var id2 = $(ele).next().prop("id");
+    if (id2 == undefined) {
+      id2 = $(ele).parent().next().find(".day-container-weekend").prop("id");
+      console.log(id2);
+    }
     var scrollOffsetY = (window.pageYOffset || document.scrollTop) - (document.clientTop || 0);
+    if (!isNaN(scrollOffsetY)) {
+      section.css({
+        position:"absolute",
+        top: event.clientY + 25 + scrollOffsetY,
+        left: event.clientX - 225
+      });
 
-    section.css({
-      position:"absolute",
-      top: event.clientY + 25 + scrollOffsetY,
-      left: event.clientX - 225
-    });
+      triangle.css({
+        position:"absolute",
+        top:-25,
+        left:200
+      })
+    } else {
+      section.css({
+        position:"absolute",
+        top: event.clientY + 25,
+        left: event.clientX - 225
+      });
 
-    triangle.css({
-      position:"absolute",
-      top:-25,
-      left:200
-    })
+      triangle.css({
+        position:"absolute",
+        top:-25,
+        left:200
+      })
+    }
 
     section.show();
     triangle.show();
@@ -343,14 +366,14 @@ var calendarApp = (function ($) {
     //variables
     var cssID = id;
     var nextCssID = id2;
+    console.log(cssID);
     var today = new Date();
-
     //get default values
     var defaultTitle = "Untitled"
     var date1 = getDate(cssID);
     var date2 = getDate(nextCssID);
     var time1 = getTime(today);
-    var time2 = getTime(today.addHours(1))
+    var time2 = getTime(today.addHours(1));
 
     //insert to menu
     $('[name="name"]').val(defaultTitle);
@@ -398,7 +421,7 @@ var calendarApp = (function ($) {
     var alert = $('[name=alertSelector]').val();
     var travelTime = $('[name=traveltime]').val();
     var totalPeople = $('.invitee').length;
-    var totalURLS = $('.urls').length;
+    var totalURLS = $('.url').length;
     var invitees = getPeople(totalPeople);
     var location = $('[name=location]').val();
     var notes = $('[name=notes]').val();
@@ -559,18 +582,24 @@ var calendarApp = (function ($) {
   }
 
   var parseDate = function (cssID) {
-    var id = cssID.replace("#","");
-    var dateValueArray = id.split("-");
-    if (dateValueArray.length > 1) {
-      var day = dateValueArray[0];
-      var month = dateValueArray[1];
-      var year = dateValueArray[2];
-      month = cal_months_labels[month];
-      month = month.substring(0,3);
-      id = month + " " + day + ", " + year;
-      return id;
+    if (cssID != undefined) {
+      var id = cssID;
+      id = cssID.replace("#","");
+      var dateValueArray = id.split("-");
+      if (dateValueArray.length > 1) {
+        var day = dateValueArray[0];
+        var month = dateValueArray[1];
+        var year = dateValueArray[2];
+        month = cal_months_labels[month];
+        month = month.substring(0,3);
+        id = month + " " + day + ", " + year;
+        return id;
+      }
+      return cssID
+    } else {
+      return null;
     }
-    return cssID
+
   }
 
   var invitePeopleInputEvent = function (event,ele) {
@@ -605,6 +634,7 @@ var calendarApp = (function ($) {
     $('.hidden-iframe-container').slideDown(200);
     $('.website-name').text(websiteName);
     $('.hidden-iframe').prop("src",value);
+    $('.loader').show(0);
     setTimeout(function () {
       hideCalMenuCreate();
       $('.popup-menu').hide();
@@ -668,30 +698,57 @@ var calendarApp = (function ($) {
     setTimeout(hideCalMenuCreate,1);
     var selectorID = $(ele).prop("id");
     var calEvent = getCalEventByID(selectorID);
-    var menu = $('.popup-menu');
-    var triangle = $('.triangle-up');
+    var menu = $(ele).find('.popup-menu');
+    var triangle = $(ele).find('.triangle-up');
     var scrollOffsetY = (window.pageYOffset || document.scrollTop) - (document.clientTop || 0);
-    menu.show();
-    menu.css({
-      position:"absolute",
-      top: event.clientY + 25 + scrollOffsetY,
-      left: event.clientX - 220
-    });
-    triangle.css({
-      position:"absolute",
-      top:-25,
-      left:200
-    })
+    setTimeout(function () {
+      menu.show();
+      triangle.show();
+    }, 3);
+    if (! isNaN(scrollOffsetY)) {
+      menu.css({
+        position:"absolute",
+        top: event.clientY + 25 + scrollOffsetY,
+        left: event.clientX - 220
+      });
+      triangle.css({
+        position:"absolute",
+        top:-25,
+        left:200
+      })
+    } else {
+      menu.css({
+        position:"absolute",
+        top: event.clientY + 25,
+        left: event.clientX - 220
+      });
+      triangle.css({
+        position:"absolute",
+        top:-25,
+        left:200
+      })
+    }
+
   }
 
   var hideCalMenuCreate = function () {
     var section = $('.create-calendar-event');
-    var triangle = $('.popup-menu').find('.triangle-up');
+    var triangle = $('.create-calendar-event').find('.triangle-up');
     section.stop();
     triangle.stop();
     section.hide();
     triangle.hide();
   }
+
+  $("#iframe").on("load", function () {
+    $('.loader').hide(0);
+  });
+
+  //refresh iframe
+  $('.btn-refresh').click(function () {
+    document.getElementById('hidden').contentWindow.location.reload(true);
+  })
+
 
   //return
   return {
