@@ -223,7 +223,7 @@ var calendarApp = (function ($) {
 
   CalendarEvent.prototype.generateHtmlSkeleton = function () {
     var scrollOffsetY = (window.pageYOffset || document.scrollTop) - (document.clientTop || 0);
-    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'+this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
+    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" onmouseenter="calendarApp.scrollEvent(this);" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'  +this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
     if (this.oneDay) {
       var date = getDate(this.selectorID);
       html += '<p class="menu-date">Date: '+date+'</p>';
@@ -289,9 +289,9 @@ var calendarApp = (function ($) {
   var ignition = function () {
     cal.generateHtmlSkeleton();
     $('.calendar-section').append(cal.getHtmlSkeleton())
-    var date = new Date(2016,1,18,10,30,0,1000);
+    var date = new Date(2016,2,1,10,30,0,1000);
     var calEvent = new CalendarEvent("Test",date,date);
-    calEvent.url = ["http://cnn.com","http://niceme.me"];
+    calEvent.url = ["http://cnn.com","http://niceme.me","http://eelslap.com"];
     calEvent.generateHtmlSkeleton();
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
   }
@@ -693,6 +693,11 @@ var calendarApp = (function ($) {
     $('.hidden-iframe').prop("src","");
   })
 
+  //scroll long names
+  var scrollName = function (ele) {
+    console.log('needs work');
+  }
+
   //showCalendarEvent
   var showCalendarEvent = function (ele,event) {
     setTimeout(hideCalMenuCreate,1);
@@ -763,7 +768,8 @@ var calendarApp = (function ($) {
     checkURLInputOnEnter: addUrlToContainerOnEnter,
     loadHiddenIFrame: showHiddenIFrame,
     showCalEvent: showCalendarEvent,
-    hideCalEventMenu: hideCalMenuCreate
+    hideCalEventMenu: hideCalMenuCreate,
+    scrollEvent: scrollName
   };
 
 })(jQuery);

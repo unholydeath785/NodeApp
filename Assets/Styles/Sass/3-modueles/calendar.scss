@@ -24,6 +24,7 @@ body {
     }
   }
   .day-container-weekend {
+    overflow-x: scroll;
     background-color: rgb(203, 202, 202);
     white-space: nowrap;
     overflow: hidden;
@@ -48,7 +49,7 @@ body {
       position: relative;
       font-size:18px;
       top:10px;
-      padding:10px;
+      padding:5px 10px;
       border-radius:100px;
       background-color: rgb(233, 34, 7);
       color:rgb(224, 210, 13);
@@ -57,6 +58,7 @@ body {
       color:rgb(158, 153, 153)
     }
     .calendar-event {
+      overflow-x: scroll;
       background-color:aqua;
       padding-right:5px;
       padding-left:5px;
@@ -85,6 +87,7 @@ body {
     }
   }
   .day-container {
+
     white-space: nowrap;
     overflow: hidden;
     border-right:1px solid $font-color-norm;
@@ -108,7 +111,7 @@ body {
       position: relative;
       font-size:18px;
       top:10px;
-      padding:10px;
+      padding:5px 10px;
       border-radius:100px;
       background-color: rgb(233, 34, 7);
       color:rgb(224, 210, 13);
@@ -117,6 +120,8 @@ body {
       color:rgb(158, 153, 153)
     }
     .calendar-event {
+      width: 93%;
+      overflow-x: scroll;
       background-color:aqua;
       padding-right:5px;
       padding-left:5px;
