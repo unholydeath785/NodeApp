@@ -471,8 +471,6 @@ body {
     .calendar-container .day-container-weekend .outside-of-day-range {
       color: #9e9999; }
     .calendar-container .day-container-weekend .calendar-event {
-      overflow-x: scroll;
-      background-color: aqua;
       padding-right: 5px;
       padding-left: 5px;
       text-align: left;
@@ -486,7 +484,6 @@ body {
         -webkit-align-self: flex-start;
         align-self: flex-start; }
       .calendar-container .day-container-weekend .calendar-event .calendar-event-time {
-        background-color: #00b4b4;
         border-radius: 10px;
         margin-right: -5px;
         margin-left: -5px;
@@ -525,8 +522,6 @@ body {
       color: #9e9999; }
     .calendar-container .day-container .calendar-event {
       width: 93%;
-      overflow-x: scroll;
-      background-color: aqua;
       padding-right: 5px;
       padding-left: 5px;
       text-align: left;
@@ -542,7 +537,6 @@ body {
         -webkit-align-self: flex-start;
         align-self: flex-start; }
       .calendar-container .day-container .calendar-event .calendar-event-time {
-        background-color: #00b4b4;
         border-radius: 10px;
         margin-right: -5px;
         margin-left: -5px;
@@ -682,27 +676,59 @@ body {
     width: 350px;
     margin-left: 25px; }
 
-.schedule-tab {
-  top: 400px;
-  position: fixed;
-  left: 307px;
-  background-color: #c4c4c4;
-  -webkit-transform: rotate(-90deg);
-  -moz-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  -o-transform: rotate(-90deg);
-  padding: 5px 25px; }
-  .schedule-tab .tab-text {
-    height: 400px; }
-
-.schedule-container {
-  position: fixed;
-  margin-top: 100px;
-  top: 0px;
-  left: 0px;
+.schedule-wrapper {
   width: 350px;
-  height: 600px;
-  background-color: #e0dae3; }
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0; }
+  .schedule-wrapper .schedule-tab {
+    -webkit-transition: left 0.4s ease;
+    -moz-transition: left 0.4s ease;
+    -o-transition: left 0.4s ease;
+    -ms-transition: left 0.4s ease;
+    transition: left 0.4s ease;
+    cursor: pointer;
+    top: 400px;
+    position: fixed;
+    left: 307px;
+    background-color: #A2CFA6;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    padding: 5px 25px; }
+    .schedule-wrapper .schedule-tab:hover {
+      border: 1px solid black; }
+    .schedule-wrapper .schedule-tab .tab-text {
+      height: 400px; }
+  .schedule-wrapper .schedule-container {
+    -webkit-transition: width 0.5s ease;
+    -moz-transition: width 0.5s ease;
+    -o-transition: width 0.5s ease;
+    -ms-transition: width 0.5s ease;
+    transition: width 0.5s ease;
+    position: fixed;
+    margin-top: 100px;
+    top: 0px;
+    left: 0px;
+    width: 350px;
+    height: 75%;
+    background-color: #bbbbbb; }
+    .schedule-wrapper .schedule-container .schedule-menu .schedule-title {
+      text-align: center; }
+    .schedule-wrapper .schedule-container .schedule-menu .schedule-list {
+      list-style: none; }
+      .schedule-wrapper .schedule-container .schedule-menu .schedule-list .schedule-color {
+        display: flex-block;
+        height: 25px;
+        width: 25px;
+        margin-right: 15px;
+        border: 1px solid black;
+        float: left;
+        cursor: pointer; }
+        .schedule-wrapper .schedule-container .schedule-menu .schedule-list .schedule-color:hover {
+          border: 2px solid black; }
 
 .tooltip {
   position: relative;

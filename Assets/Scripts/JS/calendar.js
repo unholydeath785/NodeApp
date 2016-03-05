@@ -18,7 +18,8 @@ var calendarApp = (function ($) {
   var isScheduleShowing = false;
   var longEventIsChecked = false;
   var allDayIsChecked = false;
-  var calendarEventsArray = []
+  var calendarEventsArray = [];
+  var scheduleArray = [];
   var cal_days_labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var cal_months_labels = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var cal_days_in_months = [31,28,31,30,31,30,31,31,30,31,30,31];
@@ -179,6 +180,7 @@ var calendarApp = (function ($) {
       var calEvent = calendarEventsArray[i];
       calEvent.generateHtmlSkeleton();
       $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
+      calEvent.colorHtml();
     }
   };
 
@@ -188,9 +190,10 @@ var calendarApp = (function ($) {
   //||                                    ||
   //========================================
 
-  function CalendarEvent(name,date,date1) {
+  function CalendarEvent(name,date,date1,schedule) {
     this.name = name;
-    this.schedule = 'default';
+    this.isShowing = true;
+    this.schedule = schedule;
     this.year = date.getFullYear();
     this.month = date.getMonth();
     this.day = date.getDate();
@@ -218,14 +221,16 @@ var calendarApp = (function ($) {
     var timeStamp = new Date(this.year,this.month,this.day,this.hour,this.minute,0,1000);
     this.timeString = getTime(timeStamp);
     this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
-    this.selectorID = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
+    this.selectorID2 = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
     this.html = '';
     calendarEventsArray.push(this);
+    var schedule = getSchedule(schedule);
+    schedule.calEvents.push(this);
   }
 
   CalendarEvent.prototype.generateHtmlSkeleton = function () {
     var scrollOffsetY = (window.pageYOffset || document.scrollTop) - (document.clientTop || 0);
-    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" onmouseenter="calendarApp.scrollEvent(this);" class="calendar-event" id="'+this.selectorID+'"><span class="calendar-event-name">'  +this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
+    var html = '<div onclick="calendarApp.showCalEvent(this,event)" draggable="true" ondragstart="calendarApp.drag(event)" onmouseenter="calendarApp.scrollEvent(this);" class="calendar-event '+this.schedule+'" id="'+this.selectorID+'"><span class="calendar-event-name">'  +this.name+'</span><span class="calendar-event-time">'+this.timeString+'</span><div class="popup-menu"><div class="triangle-up"></div><div class="popup-menu-wrapper"><div class="popup-menu-container"><h1 class="popup-title">'+this.name+'</h1>';
     if (this.oneDay) {
       var date = getDate(this.selectorID);
       html += '<p class="menu-date">Date: '+date+'</p>';
@@ -277,6 +282,13 @@ var calendarApp = (function ($) {
     return this.html
   }
 
+  CalendarEvent.prototype.colorHtml = function () {
+    var schedule = getSchedule(this.schedule);
+    console.log(schedule.color);
+    $('.'+this.schedule).css("background-color",schedule.color);
+    $('.'+this.schedule).find('.calendar-event-time').css("background-color",schedule.color);
+  };
+
   //getters
 
   var getCalEventByID = function(id) {
@@ -298,19 +310,44 @@ var calendarApp = (function ($) {
     this.name = name;
     this.color = color;
     this.calEvents = [];
-    this.showing = false;
-
+    this.isShowing = true;
+    this.html = '';
+    scheduleArray.push(this);
   }
+
+  Schedule.prototype.generateHtmlSkeleton = function () {
+    var html = '<li onclick="calendarApp.toggleSchedule(this)" class="schedule-info" id="'+this.name+'"><span class="schedule-color"></span><span class="schedule-name">'+this.name+'</span></li>'
+    this.html = html;
+  };
+
+  Schedule.prototype.getHtmlSkeleton = function () {
+    return this.html;
+  };
+
+  Schedule.prototype.colorHtml = function () {
+    var id = '#'+this.name;
+    if (this.isShowing) {
+        $('.schedule-list').find(id).find('.schedule-color').css('background-color',this.color);
+    } else {
+      $('.schedule-list').find(id).find('.schedule-color').css('background-color','rgb(187,187,187)');
+    }
+
+  };
 
   //functions
   var ignition = function () {
     cal.generateHtmlSkeleton();
     $('.calendar-section').append(cal.getHtmlSkeleton())
+    var schedule = new Schedule('Default','yellow');
+    schedule.generateHtmlSkeleton();
+    $('.schedule-list').append(schedule.getHtmlSkeleton());
+    schedule.colorHtml();
     var date = new Date(2016,2,1,10,30,0,1000);
-    var calEvent = new CalendarEvent("Test",date,date);
+    var calEvent = new CalendarEvent("Test",date,date,'Default');
     calEvent.url = ["http://cnn.com","http://niceme.me","http://eelslap.com"];
     calEvent.generateHtmlSkeleton();
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
+    calEvent.colorHtml();
   }
 
   var updateMonth = function (changeMonthVal) {
@@ -467,6 +504,7 @@ var calendarApp = (function ($) {
     calEvent.lists = lists;
     calEvent.generateHtmlSkeleton()
     $(calEvent.selectorID).append(calEvent.getHtmlSkeleton());
+    calEvent.colorHtml();
   }
 
   var testIfEmpty = function (variable) {
@@ -771,11 +809,78 @@ var calendarApp = (function ($) {
     document.getElementById('hidden').contentWindow.location.reload(true);
   })
 
-
+  var isShowing = true;
   $('.schedule-tab').click(function () {
-    $('.schedule-container').toggle();
+    var container = $('.schedule-container');
+    var tab = $('.schedule-tab');
+    var wrapper = $('.schedule-wrapper');
+    if (isShowing) {
+      $('.schedule-menu').toggle();
+      isShowing = false;
+      tab.css({
+        'padding-top':'100px',
+        left:0
+      })
+      container.css({
+        width:0
+      })
+      wrapper.css({
+        width:50
+      })
+      setTimeout(function () {
+        $('.schedule-container').toggle();
+      }, 500);
+    } else {
+      isShowing = true;
+      $('.schedule-container').toggle();
+      $('.schedule-menu').toggle();
+      tab.css({
+        'padding-top':5,
+        left:307
+      })
+      container.css({
+        width:350
+      })
+      wrapper.css({
+        width:400
+      })
+    }
   })
 
+  var displaySchedule = function (ele) {
+    var scheduleName = $(ele).prop("id");
+    var schedule = getSchedule(scheduleName);
+    if (schedule != null) {
+      if (schedule.isShowing) {
+        schedule.isShowing = false;
+        for (var i = 0; i < schedule.calEvents.length; i++) {
+          var calEvent = schedule.calEvents[i]
+          calEvent.isShowing = false;
+          var selectorClass = '.'+calEvent.schedule;
+          $(selectorClass).hide();
+        }
+        schedule.colorHtml();
+      } else {
+        schedule.isShowing = true;
+        for (var i = 0; i < schedule.calEvents.length; i++) {
+          var calEvent = schedule.calEvents[i]
+          calEvent.isShowing = true;
+          var selectorClass = '.'+calEvent.schedule;
+          $(selectorClass).show();
+        }
+        schedule.colorHtml();
+      }
+    }
+  }
+
+  var getSchedule = function (name) {
+    for (var i = 0; i < scheduleArray.length; i ++) {
+      if (scheduleArray[i].name == name) {
+        return scheduleArray[i];
+      }
+    }
+    return null;
+  }
 
   //return
   return {
@@ -791,7 +896,8 @@ var calendarApp = (function ($) {
     loadHiddenIFrame: showHiddenIFrame,
     showCalEvent: showCalendarEvent,
     hideCalEventMenu: hideCalMenuCreate,
-    scrollEvent: scrollName
+    scrollEvent: scrollName,
+    toggleSchedule: displaySchedule
   };
 
 })(jQuery);
