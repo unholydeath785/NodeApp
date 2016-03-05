@@ -15,6 +15,7 @@ Date.prototype.addHours = function (hours) {
 
 var calendarApp = (function ($) {
   //Gloabl for fall back in case of nessacary excess functions
+  var isScheduleShowing = false;
   var longEventIsChecked = false;
   var allDayIsChecked = false;
   var calendarEventsArray = []
@@ -189,6 +190,7 @@ var calendarApp = (function ($) {
 
   function CalendarEvent(name,date,date1) {
     this.name = name;
+    this.schedule = 'default';
     this.year = date.getFullYear();
     this.month = date.getMonth();
     this.day = date.getDate();
@@ -283,6 +285,21 @@ var calendarApp = (function ($) {
         return calendarEventsArray[i];
       }
     }
+  }
+
+  //========================================
+  //||                                    ||
+  //||            Schedule                ||
+  //||                                    ||
+  //========================================
+
+
+  function Schedule (name,color) {
+    this.name = name;
+    this.color = color;
+    this.calEvents = [];
+    this.showing = false;
+
   }
 
   //functions
@@ -752,6 +769,11 @@ var calendarApp = (function ($) {
   //refresh iframe
   $('.btn-refresh').click(function () {
     document.getElementById('hidden').contentWindow.location.reload(true);
+  })
+
+
+  $('.schedule-tab').click(function () {
+    $('.schedule-container').toggle();
   })
 
 
