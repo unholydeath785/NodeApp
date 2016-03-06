@@ -192,6 +192,7 @@ var calendarApp = (function ($) {
 
   function CalendarEvent(name,date,date1,schedule) {
     this.name = name;
+    console.log(schedule);
     this.isShowing = true;
     this.schedule = schedule;
     this.year = date.getFullYear();
@@ -224,8 +225,8 @@ var calendarApp = (function ($) {
     this.selectorID2 = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
     this.html = '';
     calendarEventsArray.push(this);
-    var schedule = getSchedule(schedule);
-    schedule.calEvents.push(this);
+    var calSchedule = getSchedule(this.schedule);
+    calSchedule.calEvents.push(this);
   }
 
   CalendarEvent.prototype.generateHtmlSkeleton = function () {
@@ -316,7 +317,7 @@ var calendarApp = (function ($) {
   }
 
   Schedule.prototype.generateHtmlSkeleton = function () {
-    var html = '<li onclick="calendarApp.toggleSchedule(this)" class="schedule-info" id="'+this.name+'"><span class="schedule-color"></span><span class="schedule-name">'+this.name+'</span></li>'
+    var html = '<li onclick="calendarApp.toggleSchedule(this)" class="schedule-info" id="'+this.name+'"><span class="schedule-color"></span><span class="schedule-name">'+this.name+'</span></li><br>';
     this.html = html;
   };
 
@@ -342,6 +343,10 @@ var calendarApp = (function ($) {
     schedule.generateHtmlSkeleton();
     $('.schedule-list').append(schedule.getHtmlSkeleton());
     schedule.colorHtml();
+    var schedule1 = new Schedule('Soccer','orange');
+    schedule1.generateHtmlSkeleton();
+    $('.schedule-list').append(schedule1.getHtmlSkeleton());
+    schedule1.colorHtml();
     var date = new Date(2016,2,1,10,30,0,1000);
     var calEvent = new CalendarEvent("Test",date,date,'Default');
     calEvent.url = ["http://cnn.com","http://niceme.me","http://eelslap.com"];
@@ -435,6 +440,17 @@ var calendarApp = (function ($) {
     $('[name="date2"]').val(date2);
     $('[name="time1"]').val(time1);
     $('[name="time2"]').val(time2);
+
+    //populate menus
+    populateScheduleMenu();
+  }
+
+  var populateScheduleMenu = function () {
+    var html = '';
+    for (var i = 0; i < scheduleArray.length; i++) {
+      html += '<option>'+scheduleArray[i].name+'</option>';
+    }
+    $('.scheduele-selector').append(html);
   }
 
   var getCalEventMenuData = function () {
@@ -463,11 +479,13 @@ var calendarApp = (function ($) {
     var hour = getHour(time1);
     var minute = getMinute(time1);
     var date = createDate(year,month,day,hour,minute);
+    var schedule = $('.scheduele-selector').val();
+
     var calEvent;
     if (date2 != '') {
-      calEvent = new CalendarEvent(title,date1,date2);
+      calEvent = new CalendarEvent(title,date1,date2,schedule);
     } else {
-      calEvent = new CalendarEvent(title,date,date);
+      calEvent = new CalendarEvent(title,date,date,schedule);
     }
 
     //get extra info
