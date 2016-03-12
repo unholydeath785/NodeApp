@@ -9,8 +9,6 @@
     <header class="header">
     </header>
     <section class="calendar-section">
-      <span class="prev-month" onclick="calendarApp.changeMonth(-1)">Prev Month</span>
-      <span class="next-month" onclick="calendarApp.changeMonth(1)">Next Month</span>
     </section>
     <section class="create-calendar-event">
       <div class="create-calendar-event-container">
@@ -36,7 +34,7 @@
             <option value="Every Month">Every Month</option>
             <option value="Every Year">Every Year</option>
             <option class="divider" disabled role="separator">_______________</option>
-            <option value="Custom">Custom...</option>
+            <option onclick="console.log('carl')" value="Custom">Custom...</option>
           </select>
           <br>
           <label>Alert: </label><select class="alert-selector" name="alertSelector">
@@ -108,6 +106,7 @@
                   <span class="color color-3-2"></span>
                   <span class="color color-3-3"></span>
                 </div>
+                <input class="color-hexcode" type="text" name="hexcode" placeholder="#FFFFFF">
               </div>
             </div>
             <button type="button" class="finalize-schedule">Create Schedule</button>
@@ -115,7 +114,6 @@
         </div>
       </div>
     </section>
-
 
     <section class="hidden-iframe-overlay">
       <div class="hidden-iframe-container">
@@ -128,6 +126,20 @@
           <div class="loader">Loading...</div>
         </div>
         <iframe class="hidden-iframe" id="hidden" src=""></iframe>
+      </div>
+    </section>
+
+    <section class="custom-wrapper">
+      <div class="custom-repeat-container">
+        <label>Frequency: </label>
+        <select class="custom-repeat-selector" name="customrepeat">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+
+        <button type="button" name="cancel">Cancel</button><button type="button" name="ok">Ok</button>
       </div>
     </section>
     <script charset="utf-8">window.$ = window.jQuery = require('./Assets/Scripts/JS/jquery.js');</script>

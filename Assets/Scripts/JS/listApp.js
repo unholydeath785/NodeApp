@@ -1,5 +1,5 @@
-var jsonfile = require('jsonfile')
-var request = require('request')
+var jsonfile = require('jsonfile');
+var request = require('request');
 
 var listArray = [];
 var file = '/Users/EvanCoulson/data.json'
@@ -504,7 +504,6 @@ function clearAddMenu() {
 
 function writeJSONData() {
   jsonfile.writeFile(file, listArray, function (err) {
-    uploadFileToServer()
   })
 }
 

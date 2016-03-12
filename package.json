@@ -38,5 +38,9 @@
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.2",
     "q": "^1.0.1"
+  },
+  "build": {
+    "app-bundle-id": "MyHub.id",
+    "app-category-type": "MyHub.app.hub.app"
   }
 }
