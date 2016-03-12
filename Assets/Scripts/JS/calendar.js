@@ -372,6 +372,7 @@ var calendarApp = (function ($) {
         if ((month > this.month && year == this.year) || year > this.year) {
           var repeatSelectorID = '#'+day+'-'+this.month+'-'+year;
           this.repeatSelectorID.push(repeatSelectorID);
+          console.log("carl");
         }
         break;
         default:
