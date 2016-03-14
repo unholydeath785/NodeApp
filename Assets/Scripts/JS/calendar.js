@@ -245,6 +245,7 @@ var calendarApp = (function ($) {
     this.selectorID = '#'+this.day+'-'+this.month+'-'+this.year;
     this.selectorID2 = '#'+this.endDay+'-'+this.endMonth+'-'+this.endYear;
     this.repeatSelectorID = [];
+    this.customRepeat = null;
     this.html = '';
     var calSchedule = getSchedule(this.schedule);
     calSchedule.calEvents.push(this);
@@ -372,8 +373,10 @@ var calendarApp = (function ($) {
         if ((month > this.month && year == this.year) || year > this.year) {
           var repeatSelectorID = '#'+day+'-'+this.month+'-'+year;
           this.repeatSelectorID.push(repeatSelectorID);
-          console.log("carl");
         }
+        break;
+        case 'Custom':
+
         break;
         default:
           break;
@@ -453,6 +456,22 @@ var calendarApp = (function ($) {
     }
 
   };
+
+  //========================================
+  //||                                    ||
+  //||          Custom Repeat             ||
+  //||                                    ||
+  //========================================
+
+  function CustomRepeat(type,interval) {
+    this.type = type;
+    this.interval = interval;
+    this.dayOfWeek = null;
+    this.dayOfMonth = null;
+    this.monthString = null;
+    this.monthOfYear = null;
+    this.yearString = null;
+  }
 
   //functions
   var ignition = function () {
@@ -574,7 +593,7 @@ var calendarApp = (function ($) {
       date2 = $('[name="date2"]').val();
       date2 = parseDate(date2);
       var year1 = getYear(date1);
-      var month1 = getMonth(date1) - 1;
+      var month1 = getMonth(date1);
       var day1 = getDay(date1);
       var hour1 = getHour(time1);
       var minute1 = getMinute(time1);
@@ -585,7 +604,7 @@ var calendarApp = (function ($) {
 
     //convert values
     var year = getYear(date1);
-    var month = getMonth(date1) - 1;
+    var month = getMonth(date1);
     var day = getDay(date1);
     var hour = getHour(time1);
     var minute = getMinute(time1);
@@ -620,6 +639,47 @@ var calendarApp = (function ($) {
     notes = testIfEmpty(notes);
     urls = testIfEmptyArray(urls);
     lists = testIfEmpty(lists);
+
+    //Test for custom inputs
+    if (repeat == 'Custom') {
+      var type = $('.custom-repeat-selector').val();
+      var interval = $('.repeat-delay-data').val();
+      if (type == 'daily') {
+        var customRepeat = new CustomRepeat(type,interval);
+        calEvent.customRepeat = customRepeat;
+      } else if (type == 'weekly') {
+        var daysOfWeek = [];
+        var selectableDays = document.querySelectorAll("#active");
+        for (var i = 0; i < selectableDays.length; i++) {
+          var day = selectableDays[i];
+          day = $(day).find('span').prop("id");
+          daysOfWeek.push(day);
+        }
+        var customRepeat = new CustomRepeat(type,interval)
+        customRepeat.dayOfWeek = daysOfWeek;
+      } else if (type == 'monthly') {
+        var daysOfMonth = [];
+        var selectableDays = document.querySelectorAll("#active");
+        for (var i = 0; i < selectableDays.length; i++) {
+          var day = selectableDays[i];
+          day = $(day).find('span').prop("class");
+          daysOfMonth.push(day);
+        }
+        var customRepeat = new CustomRepeat(type,interval);
+        customRepeat.dayOfMonth = daysOfMonth;
+      } else if (type == 'yearly') {
+        var months = [];
+        var selectableMonths = document.querySelectorAll("#active");
+        for (var i = 0; i < selectableMonths.length; i++) {
+          var month = selectableMonths[i];
+          month = $(month).find('span').prop("class");
+          months.push(month);
+        }
+        console.log(months);
+        var customRepeat = new CustomRepeat(type,interval);
+        customRepeat.monthOfYear = months;
+      }
+    }
 
     //insert into calendar
     calEvent.repeat = repeat;
@@ -1161,6 +1221,23 @@ var calendarApp = (function ($) {
     isCustom(this);
   })
 
+  var onCustomSelectChange = function (ele) {
+    var value = $(ele).val();
+    console.log(value);
+    if (value == 'daily') {
+      generateCustomRepeatDailyHtml();
+    }
+    if (value == 'weekly') {
+      generateCustomRepeatWeeklyHtml();
+    }
+    if (value == 'monthly') {
+      generateCustomRepeatMonthlyHtml();
+    }
+    if (value == 'yearly') {
+      generateCustomRepeatYearlyHtml();
+    }
+  }
+
   var isCustom = function (ele) {
     var value = $(ele).val();
     var id = $(ele).prop("class");
@@ -1168,13 +1245,58 @@ var calendarApp = (function ($) {
       if (id == 'repeat-selector') {
         $('.custom-wrapper').show();
         $('.custom-repeat-container').show();
-
+        generateCustomRepeatDailyHtml();
       } else {
         $('.custom-wrapper').show();
         $('.custom-alert-container').show();
       }
     }
   }
+
+  var generateCustomRepeatDailyHtml = function () {
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> day(s)</span></div><br><button type="button" name="cancel">Cancel</button><button type="button" name="ok">Ok</button></div>';
+    $('.custom-repeat').remove();
+    $('.custom-repeat-container').append(html);
+  }
+  var generateCustomRepeatWeeklyHtml = function () {
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> week(s) on:</span></div><br><div class="month-selector"><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="sun">S</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="mon">M</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="tue">T</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="wed">W</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="thu">T</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="fri">F</span></div><div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span id="sat">S</span></div></div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
+    $('.custom-repeat').remove();
+    $('.custom-repeat-container').append(html);
+  }
+
+  var generateCustomRepeatMonthlyHtml = function () {
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> month(s)</span></div><br><div class="day-selector">';
+    for (var i = 0; i < 31; i++) {
+      html += '<div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span class="'+(i+1)+'" id="mon">'+(i+1)+'</span></div>';
+    }
+    html += '</div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
+    $('.custom-repeat').remove();
+    $('.custom-repeat-container').append(html);
+  }
+
+  var generateCustomRepeatYearlyHtml = function () {
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> year(s) in:</span></div><br><div class="full-month-selector">';
+    for (var i = 0; i < 12; i++) {
+      html += '<div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span class="'+cal_months_labels[i]+'" id="mon">'+(cal_months_labels[i].substring(0,3))+'</span></div>';
+    }
+    html += '</div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
+    $('.custom-repeat').remove();
+    $('.custom-repeat-container').append(html);
+  }
+
+  var selectDay = function (ele) {
+    var id = $(ele).prop("id");
+    if (id == "active") {
+      $(ele).prop("id","");
+    } else {
+      $(ele).prop("id","active");
+    }
+  }
+
+  var finalizeRepeatMenu = function () {
+    $('.custom-wrapper').hide();
+    $('.custom-repeat-container').hide();
+  };
 
   //return
   return {
@@ -1194,7 +1316,10 @@ var calendarApp = (function ($) {
     toggleSchedule: displaySchedule,
     showScheduleMenu: showSchedules,
     showCurrentMonth: showToday,
-    testIfCustom: isCustom
+    testIfCustom: isCustom,
+    toggleDay: selectDay,
+    onCustomChange: onCustomSelectChange,
+    finalizeCustomRepeat: finalizeRepeatMenu
   };
 
 })(jQuery);

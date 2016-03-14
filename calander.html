@@ -129,17 +129,17 @@
       </div>
     </section>
 
+
+
     <section class="custom-wrapper">
       <div class="custom-repeat-container">
         <label>Frequency: </label>
-        <select class="custom-repeat-selector" name="customrepeat">
+        <select onchange="calendarApp.onCustomChange(this);" class="custom-repeat-selector" name="customrepeat">
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="monthly">Monthly</option>
           <option value="yearly">Yearly</option>
         </select>
-
-        <button type="button" name="cancel">Cancel</button><button type="button" name="ok">Ok</button>
       </div>
     </section>
     <script charset="utf-8">window.$ = window.jQuery = require('./Assets/Scripts/JS/jquery.js');</script>
