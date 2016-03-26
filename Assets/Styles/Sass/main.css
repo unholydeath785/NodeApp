@@ -882,7 +882,7 @@ body {
   .custom-wrapper .custom-repeat-container {
     padding: 25px;
     width: 300px;
-    margin: 10% auto;
+    margin: 25% auto;
     background-color: #e2e2e2;
     display: none; }
     .custom-wrapper .custom-repeat-container [name=ok] {
@@ -944,6 +944,9 @@ body {
           cursor: pointer; }
       .custom-wrapper .custom-repeat-container .full-month-selector #active {
         background-color: #838383; }
+
+.disabled {
+  opacity: 0.4; }
 
 .tooltip {
   position: relative;

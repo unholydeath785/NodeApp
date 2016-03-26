@@ -376,7 +376,9 @@ var calendarApp = (function ($) {
         }
         break;
         case 'Custom':
-
+          var repeatIDs = this.customRepeat.parseRepeat(this.selectorID);
+          console.log(repeatIDs);
+          this.repeatSelectorID = repeatIDs;
         break;
         default:
           break;
@@ -394,7 +396,6 @@ var calendarApp = (function ($) {
       $(this.selectorID).append(this.getHtmlSkeleton());
       for (var i = 0; i < this.repeatSelectorID.length; i++) {
         var selectorDate = getDateHtmlID(this.repeatSelectorID[i]);
-        console.log(selectorDate);
         this.month = selectorDate.getMonth();
         this.year = selectorDate.getFullYear();
         this.day = selectorDate.getDate();
@@ -471,7 +472,70 @@ var calendarApp = (function ($) {
     this.monthString = null;
     this.monthOfYear = null;
     this.yearString = null;
+    this.customTextSelector = null;
+    this.increment = null;
+    this.startingSelectorID = null;
   }
+
+  CustomRepeat.prototype.parseRepeat = function (calEventSelectorID) {
+    if (this.startingSelectorID == null) {
+      this.startingSelectorID = calEventSelectorID;
+    }
+    switch (this.type) {
+      case 'daily':
+        var repeatIDs = this.parseDaily();
+        return repeatIDs
+        break;
+      case 'weekly':
+        break;
+      case 'monthly':
+        break;
+      case 'yearly':
+        break;
+      default:
+        break;
+    }
+  }
+
+  CustomRepeat.prototype.parseDaily = function (calEventSelectorID) {
+    this.increment = 0;
+    var previousDate = 0;
+    var interval = parseInt(this.interval);
+    var nodeDays = document.querySelectorAll("td");
+    var hasHitStartingSelector = false;
+    var days = [];
+    var selectorIDs = [];
+    for (var i = 0; i < nodeDays.length; i++) {
+      days[i] = nodeDays[i];
+    }
+    for (var i = 0; i < days.length; i++) {
+      var selectorID = '#' + (days[i].getAttribute("id"));
+      var date1 = getDateHtmlID(selectorID);
+      var date2 = getDateHtmlID(calEventSelectorID);
+      console.log(selectorID,this.startingSelectorID);
+      if (selectorID == this.startingSelectorID) {
+        hasHitStartingSelector = true;
+      }
+      if (selectorID != "#null" && date1 > date2 && hasHitStartingSelector) {
+        this.increment++;
+        var date = $(days[i]).find('span').text();
+        if (this.increment % interval == 0) {
+          if (previousDate > date) {
+            var lastSelectorID = '#' + (days[i].getAttribute("id"));
+            this.startingSelectorID = lastSelectorID;
+            previousDate = date;
+            this.increment = 0;
+            selectorIDs.push(selectorID);
+          } else {
+            previousDate = date;
+            this.increment = 0;
+            selectorIDs.push(selectorID);
+          }
+        }
+      }
+    }
+    return selectorIDs;
+  };
 
   //functions
   var ignition = function () {
@@ -648,36 +712,14 @@ var calendarApp = (function ($) {
         var customRepeat = new CustomRepeat(type,interval);
         calEvent.customRepeat = customRepeat;
       } else if (type == 'weekly') {
-        var daysOfWeek = [];
-        var selectableDays = document.querySelectorAll("#active");
-        for (var i = 0; i < selectableDays.length; i++) {
-          var day = selectableDays[i];
-          day = $(day).find('span').prop("id");
-          daysOfWeek.push(day);
-        }
-        var customRepeat = new CustomRepeat(type,interval)
-        customRepeat.dayOfWeek = daysOfWeek;
+        var customRepeat = parseCustomWeek(type,interval);
+        calEvent.customRepeat = customRepeat;
       } else if (type == 'monthly') {
-        var daysOfMonth = [];
-        var selectableDays = document.querySelectorAll("#active");
-        for (var i = 0; i < selectableDays.length; i++) {
-          var day = selectableDays[i];
-          day = $(day).find('span').prop("class");
-          daysOfMonth.push(day);
-        }
-        var customRepeat = new CustomRepeat(type,interval);
-        customRepeat.dayOfMonth = daysOfMonth;
+        var customRepeat = parseCustomMonth(type,interval);
+        calEvent.customRepeat = customRepeat;
       } else if (type == 'yearly') {
-        var months = [];
-        var selectableMonths = document.querySelectorAll("#active");
-        for (var i = 0; i < selectableMonths.length; i++) {
-          var month = selectableMonths[i];
-          month = $(month).find('span').prop("class");
-          months.push(month);
-        }
-        console.log(months);
-        var customRepeat = new CustomRepeat(type,interval);
-        customRepeat.monthOfYear = months;
+        var customRepeat = parseCustomYear(type,interval);
+        calEvent.customRepeat = customRepeat;
       }
     }
 
@@ -694,6 +736,111 @@ var calendarApp = (function ($) {
     calEvent.generateHtmlSkeleton();
     calEvent.appendCalendarEvent();
     calEvent.colorHtml();
+  }
+
+  var parseCustomWeek = function (type,interval) {
+    var daysOfWeek = [];
+    var selectableDays = document.querySelectorAll("#active");
+    for (var i = 0; i < selectableDays.length; i++) {
+      var day = selectableDays[i];
+      day = $(day).find('span').prop("id");
+      daysOfWeek.push(day);
+    }
+    var customRepeat = new CustomRepeat(type,interval)
+    customRepeat.dayOfWeek = daysOfWeek;
+    return customRepeat;
+  }
+
+  var parseCustomMonth = function (type,interval) {
+    var daysOfMonth = [];
+    var customText = [];
+    var selectableDays = document.querySelectorAll("#active");
+    if (selectableDays.length > 0) {
+      for (var i = 0; i < selectableDays.length; i++) {
+        var day = selectableDays[i];
+        day = $(day).find('span').prop("class");
+        daysOfMonth.push(day);
+      }
+      var customRepeat = new CustomRepeat(type,interval);
+      customRepeat.dayOfMonth = daysOfMonth;
+      return customRepeat;
+    } else {
+      var incrementVal = $('.month-text-selector').find('.day-of-month-selector').val();
+      var dayVal = $('.month-text-selector').find('.day-of-week-selector').val();
+      switch (incrementVal) {
+        case 'first':
+          incrementVal = 0;
+          break;
+        case 'second':
+          incrementVal = 1;
+          break;
+        case 'third':
+          incrementVal = 2;
+          break;
+        case 'fourth':
+          incrementVal = 3;
+          break;
+        case 'fifth':
+          incrementVal = 4;
+          break;
+        default:
+          incrementVal = 0;
+      }
+      for (var i = 0; i < cal_days_labels.length; i++) {
+        if (dayVal.substring(0,3) == cal_days_labels[i].toLowerCase()) {
+          dayVal = cal_days_labels[i].toLowerCase();
+        }
+      }
+      customText = [incrementVal,dayVal];
+      var customRepeat = new CustomRepeat(type,interval);
+      customRepeat.customTextSelector = customText;
+      return customRepeat;
+    }
+    return null;
+  }
+
+  var parseCustomYear = function (type,interval) {
+    var months = [];
+    var customText = [];
+    var selectableMonths = document.querySelectorAll("#active");
+    for (var i = 0; i < selectableMonths.length; i++) {
+      var month = selectableMonths[i];
+      month = $(month).find('span').prop("class");
+      months.push(month);
+    }
+    if (!$('.text-selector').prop("disabled")) {
+      var incrementVal = $('.text-selector').find('.day-of-month-selector').val();
+      var dayVal = $('.text-selector').find('.day-of-week-selector').val();
+      switch (incrementVal) {
+        case 'first':
+          incrementVal = 0;
+          break;
+        case 'second':
+          incrementVal = 1;
+          break;
+        case 'third':
+          incrementVal = 2;
+          break;
+        case 'fourth':
+          incrementVal = 3;
+          break;
+        case 'fifth':
+          incrementVal = 4;
+          break;
+        default:
+          incrementVal = 0;
+      }
+      for (var i = 0; i < cal_days_labels.length; i++) {
+        if (dayVal.substring(0,3) == cal_days_labels[i].toLowerCase()) {
+          dayVal = cal_days_labels[i].toLowerCase();
+        }
+      }
+      customText = [incrementVal,dayVal];
+    }
+    var customRepeat = new CustomRepeat(type,interval);
+    customRepeat.monthOfYear = months;
+    customRepeat.customTextSelector = customText;
+    return customRepeat;
   }
 
   var testIfEmpty = function (variable) {
@@ -1254,7 +1401,7 @@ var calendarApp = (function ($) {
   }
 
   var generateCustomRepeatDailyHtml = function () {
-    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> day(s)</span></div><br><button type="button" name="cancel">Cancel</button><button type="button" name="ok">Ok</button></div>';
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> day(s)</span></div><br><button type="button" name="cancel">Cancel</button><button type="button" onclick="calendarApp.finalizeCustomRepeat()" name="ok">Ok</button></div>';
     $('.custom-repeat').remove();
     $('.custom-repeat-container').append(html);
   }
@@ -1265,11 +1412,11 @@ var calendarApp = (function ($) {
   }
 
   var generateCustomRepeatMonthlyHtml = function () {
-    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input type="text" class="repeat-delay-data"><span class="repeat-delay-text"> month(s)</span></div><br><div class="day-selector">';
+    var html = '<div class="custom-repeat"><div class="repeat-delay"><br><span class="repeat-delay-text">Every </span><input class="month-radio" type="text" class="repeat-delay-data"><span class="repeat-delay-text"> month(s)</span></div><br><label>Each</label><input onclick="calendarApp.radioCheck(this)" type="radio" checked name="month" value="month-2"><div class="container-cover" id="month-1"><div class="day-selector">';
     for (var i = 0; i < 31; i++) {
       html += '<div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span class="'+(i+1)+'" id="mon">'+(i+1)+'</span></div>';
     }
-    html += '</div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
+    html += '</div></div><br><label>On the</label><input onclick="calendarApp.radioCheck(this)" class="month-radio" type="radio" name="month" value="month-1"><div class="month-text-selector" id="month-2"><select class="day-of-month-selector" disabled name="dayofmonthselector"><option value="first">First</option><option value="second">Second</option><option value="third">Third</option><option value="fourth">Fourth</option><option value="fifth">Fifth</option><option value="last">Last</option></select><select disabled class="day-of-week-selector" name="dayofweekselector"><option value="sunday">Sunday</option><option value="monday">Monday</option><option value="tuesday">Tuesday</option><option value="wednesday">Wednesday</option><option value="thursday">Thursday</option><option value="friday">Friday</option><option value="saturday">Saturday</option><option class="divider" disabled role="separator">___________________</option><option value="day">Day</option><option value="weekday">Week Day</option><option value="weekendday">Weekend Day</option></select></div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
     $('.custom-repeat').remove();
     $('.custom-repeat-container').append(html);
   }
@@ -1279,17 +1426,51 @@ var calendarApp = (function ($) {
     for (var i = 0; i < 12; i++) {
       html += '<div class="selectable-day" onclick="calendarApp.toggleDay(this)"><span class="'+cal_months_labels[i]+'" id="mon">'+(cal_months_labels[i].substring(0,3))+'</span></div>';
     }
-    html += '</div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
+    html += '</div><br><label>On the</label><input onclick="calendarApp.radioCheck(this)" class="month-radio" type="checkbox" name="month" value="month-3"><div class="text-selector"><select class="day-of-month-selector" disabled name="dayofmonthselector"><option value="first">First</option><option value="second">Second</option><option value="third">Third</option><option value="fourth">Fourth</option><option value="fifth">Fifth</option><option value="last">Last</option></select><select disabled class="day-of-week-selector" name="dayofweekselector"><option value="sunday">Sunday</option><option value="monday">Monday</option><option value="tuesday">Tuesday</option><option value="wednesday">Wednesday</option><option value="thursday">Thursday</option><option value="friday">Friday</option><option value="saturday">Saturday</option><option class="divider" disabled role="separator">___________________</option><option value="day">Day</option><option value="weekday">Week Day</option><option value="weekendday">Weekend Day</option></select></div><br><button type="button" name="cancel">Cancel</button><button onclick="calendarApp.finalizeCustomRepeat()" type="button" name="ok">Ok</button></div>';
     $('.custom-repeat').remove();
     $('.custom-repeat-container').append(html);
   }
 
+  var checkRadioChecked = function (ele) {
+    if ($(ele).val() == "month-1") {
+      $('.selectable-day').prop("id","disabled")
+      $('.selectable-day').css({
+        opacity:0.4
+      })
+      $('.month-text-selector').find("select").prop("disabled",false);
+      $('.month-text-selector').css({
+        opcaity:1
+      })
+    }
+    if ($(ele).val() == "month-2") {
+      $('.selectable-day').prop("id","")
+      $('.selectable-day').css({
+        opacity:1
+      })
+      $('.month-text-selector').find("select").prop("disabled",true);
+      $('.month-text-selector').css({
+        opcaity:0.4
+      })
+    }
+    if ($(ele).val() == "month-3") {
+      var checked = $(ele).prop("checked");
+      if (checked) {
+        $('.text-selector').find("select").prop("disabled",false);
+      } else {
+        $('.text-selector').find("select").prop("disabled",true);
+      }
+    }
+  }
+
   var selectDay = function (ele) {
     var id = $(ele).prop("id");
-    if (id == "active") {
-      $(ele).prop("id","");
-    } else {
-      $(ele).prop("id","active");
+    var classID = $('.selectable-day').prop("class");
+    if (id != "disabled") {
+      if (id == "active") {
+        $(ele).prop("id","");
+      } else {
+        $(ele).prop("id","active");
+      }
     }
   }
 
@@ -1319,7 +1500,8 @@ var calendarApp = (function ($) {
     testIfCustom: isCustom,
     toggleDay: selectDay,
     onCustomChange: onCustomSelectChange,
-    finalizeCustomRepeat: finalizeRepeatMenu
+    finalizeCustomRepeat: finalizeRepeatMenu,
+    radioCheck: checkRadioChecked
   };
 
 })(jQuery);
